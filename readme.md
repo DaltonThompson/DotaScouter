@@ -1,11 +1,5 @@
 ## dota-scouter
-Automatically scout players' favorite heroes.
-
-Notes
-----
-* This program relies upon many API calls, and is subject to the status of third parties. It is recommended to not refresh unless it seems non-functional.
-* This program is currently intended to function only when an on-going match is detected. It may sometimes continue to operate if the game has not cleared all of the data from the lines which ar being read.
-* For those who wish to alter the source code, refer to `renderer.js` when seeking to change to test mode. `playersTotalInGame` may be reduced to reduce API calls while testing, and `server_log` may be changed to a new filepath.
+Automatically scout players' most successful heroes.
 
 # What is Dota 2?
 Dota 2 is a “multiplayer online battle arena (MOBA)” game in which two teams of five players each choose a “hero” from a pool of 121, each with unique strengths. The game is highly strategic. The beginning phase, in which heroes are picked and banned, sets the stage for what will happen over approximately 45 minutes, although game lengths can vary greatly.
@@ -25,3 +19,8 @@ A player must play four games as a hero within the search period to weigh equall
 It is hard making predictions from the entire small sample available per player, given factors such as game mode, hero, other players present, heros banned, ally or enemy heroes picked, etc.
 # What are plans for the future?
 I plan to clean up code and add several features to bring it up to par with similar apps, especially dynamic pick suggestions based upon the synergy and advantage between heroes, and roles for each player. Both features could work well by using an OCR to automate the selection heroes.
+
+# Notes
+* This program relies upon many API calls, and is subject to the status of third parties. It is recommended to not refresh unless it seems non-functional.
+* This program is currently intended to function only when an on-going match is detected. It may sometimes continue to operate if the game has not cleared all of the data from the lines which ar being read.
+* For those who wish to alter the source code, refer to `renderer.js` when seeking to change to test mode. `playersTotalInGame` may be reduced to reduce API calls while testing, and `server_log` may be changed to a new filepath.
