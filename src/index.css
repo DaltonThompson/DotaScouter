@@ -1,0 +1,245 @@
+@font-face{
+    font-family:"Radiance";
+    src:url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.eot");
+    src:url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.eot?#iefix") format("embedded-opentype"),url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.woff") format("woff"),url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.ttf") format("truetype"),url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.svg#ywftsvg") format("svg");
+    font-weight:normal;
+    font-style:normal
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+
+* {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Radiance",'Open Sans', sans-serif;
+    --background-dark: rgb(34, 34, 34);
+    --background-light: rgb(68, 68, 68);
+
+    /* Original Dota2 Colors */
+    /*--player0-color: rgb(48, 116, 249);
+    --player1-color: rgb(102, 255, 192);
+    --player2-color: rgb(189, 0, 183);
+    --player3-color: rgb(248, 245, 10);
+    --player4-color: rgb(255, 105, 1);
+    --player5-color: rgb(255, 136, 197);
+    --player6-color: rgb(162, 179, 73);
+    --player7-color: rgb(99, 218, 250);
+    --player8-color: rgb(1, 131, 31);
+    --player9-color: rgb(159, 107, 0); */
+
+    /* Adjusted colors for visibility, to 100% saturation & 35% lightness */
+    --player0-color: hsl(220deg 100% 35%);
+    --player1-color: hsl(155deg 100% 35%);
+    --player2-color: hsl(302deg 100% 35%);
+    --player3-color: hsl(59deg 100% 35%);
+    --player4-color: hsl(25deg 100% 35%);
+    --player5-color: hsl(329deg 100% 35%);
+    --player6-color: hsl(70deg 100% 35%);
+    --player7-color: hsl(193deg 100% 35%);
+    --player8-color: hsl(134deg 100% 26%);
+    --player9-color: hsl(40deg 100% 35%);
+    transition: all .3s ease-in;
+}
+
+body {
+    background: linear-gradient(var(--background-dark),var(--background-light));
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* Just for easy math, width is set */
+    margin: 0;
+}
+
+#picks {
+    position: sticky;
+    top: 0;
+    padding: 1em;
+    background-color: var(--background-dark);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
+}
+
+/* Drop shadow: might add back if colors can move to similar saturation/brightness. 
+    #pick0main {
+        filter: drop-shadow(0 0 5px var(--player0-color));
+    }
+    #pick1main {
+        filter: drop-shadow(0 0 5px var(--player1-color));
+    }
+    #pick2main {
+        filter: drop-shadow(0 0 5px var(--player2-color));
+    }
+    #pick3main {
+        filter: drop-shadow(0 0 5px var(--player3-color));
+    }
+    #pick4main {
+        filter: drop-shadow(0 0 5px var(--player4-color));
+    }
+    #pick5main {
+        filter: drop-shadow(0 0 5px var(--player5-color));
+    }
+    #pick6main {
+        filter: drop-shadow(0 0 5px var(--player6-color));
+    }
+    #pick7main {
+        filter: drop-shadow(0 0 5px var(--player7-color));
+    }
+    #pick8main {
+        filter: drop-shadow(0 0 5px var(--player8-color));
+    }
+    #pick9main {
+        filter: drop-shadow(0 0 5px var(--player9-color));
+    }
+*/
+
+.pick_border {
+    /* padding: 0 0 12px 0; */
+    margin: 5px;
+    text-align: center;
+}
+/* Adds parallelogram shape to picked box, mimicking game client
+    .pick_border.radiant {
+        clip-path: polygon(0 0, 90% 0, 100% 100%, 10% 100%);
+    }
+    .pick_border.dire {
+        clip-path: polygon(10% 0, 100% 0%, 90% 100%, 0% 100%);
+    }
+*/
+
+#pick0border {
+    background: linear-gradient(79deg, var(--background-dark),var(--player0-color), var(--player0-color), var(--background-dark));
+}
+#pick1border {
+    background: linear-gradient(79deg, var(--background-dark),var(--player1-color), var(--player1-color), var(--background-dark));
+}
+#pick2border {
+    background: linear-gradient(79deg, var(--background-dark),var(--player2-color), var(--player2-color), var(--background-dark));
+}
+#pick3border {
+    background: linear-gradient(79deg, var(--background-dark),var(--player3-color), var(--player3-color), var(--background-dark));
+}
+#pick4border {
+    background: linear-gradient(79deg, var(--background-dark),var(--player4-color), var(--player4-color), var(--background-dark));
+}
+#pick5border {
+    background: linear-gradient(101deg, var(--background-dark),var(--player5-color), var(--player5-color), var(--background-dark));
+}
+#pick6border {
+    background: linear-gradient(101deg, var(--background-dark),var(--player6-color), var(--player6-color), var(--background-dark));
+}
+#pick7border {
+    background: linear-gradient(101deg, var(--background-dark),var(--player7-color), var(--player7-color), var(--background-dark));
+}
+#pick8border {
+    background: linear-gradient(101deg, var(--background-dark),var(--player8-color), var(--player8-color), var(--background-dark));
+}
+#pick9border {
+    background: linear-gradient(101deg, var(--background-dark),var(--player9-color), var(--player9-color), var(--background-dark));
+}
+
+.pick {
+    /* 'display: none' until picking functionality can be added. */
+    display: none;
+    aspect-ratio: 16/9;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: linear-gradient(var(--background-dark),var(--background-light)); /* make light even lighter? #777 */
+    position: relative;
+}
+.player_rank {
+    color: #fff;
+    text-shadow: 0 -1px 4px black;
+    font-size: 12px;
+}
+.player_name {
+    position: static;
+    margin: 5%;
+    width: 8vw;
+    color: #fff;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    text-align: center;
+    box-sizing: border-box;
+    display: inline-block;
+    text-shadow: 0 0 3px;
+}
+/* Rank images: Unused for now
+    .rankCard {
+        justify-content:center;
+        width: 50%;
+        aspect-ratio: 1;
+        background-size: cover;
+        background-position: center;
+        background-position-y: 10px;
+    }
+    .rankStar {
+        width: 100%;
+        height: 100%;
+        top: 8px;
+        position: relative;
+    } 
+*/
+
+#options {
+    padding: 0 1em 1em 1em;
+}
+.options_grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
+    grid-gap: 0.5em;
+    grid-auto-flow: column;
+}
+.options_column {
+    width: 20%;
+    position: static;
+    display: grid;
+    grid-row-gap: 5px;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.heroCard {
+    background-size: cover;
+    text-align: center;
+    padding: 5px;
+    box-sizing: border-box;
+    text-shadow: 0px 0px 10px black;
+    color: white;
+    box-shadow: 0 2px 5px 0px black;
+    border-radius: 0.5em;
+    width: 100%;
+    aspect-ratio: 16/9;
+}
+
+.grid_column0 {
+    grid-column: 1;
+}
+.grid_column1 {
+    grid-column: 2;
+}
+.grid_column2 {
+    grid-column: 3;
+}
+.grid_column3 {
+    grid-column: 4;
+}
+.grid_column4 {
+    grid-column: 5;
+}
+.center_column {
+    grid-column: 6;
+}
+.grid_column5 {
+    grid-column: 7;
+}
+.grid_column6 {
+    grid-column: 8;
+}
+.grid_column7 {
+    grid-column: 9;
+}
+.grid_column8 {
+    grid-column: 10;
+}
+.grid_column9 {
+    grid-column: 11;
+}
