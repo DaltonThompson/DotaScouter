@@ -1,7 +1,7 @@
 {
-  "name": "dota-scouter-v3",
-  "productName": "dota-scouter-v3",
-  "version": "1.0.0",
+  "name": "dota-scouter",
+  "productName": "Dota Scouter",
+  "version": "0.1.0",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
