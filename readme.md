@@ -1,6 +1,9 @@
 # dota-scouter
 Automatically scout players' most successful heroes.
 
+## Warning
+This program accesses a local file, and requests from OpenDota and Stratz. You may subject yourself to security vulnerabilities by running this on your system. For now, this has only been tested on Mac OSX 10.14.4 and is hardcoded to a filepath that may not work for you.
+
 ## What is Dota 2?
 Dota 2 is a “multiplayer online battle arena (MOBA)” game in which two teams of five players each choose a “hero” from a pool of 121, each with unique strengths. The game is highly strategic. The beginning phase, in which heroes are picked and banned, sets the stage for what will happen over approximately 45 minutes, although game lengths can vary greatly.
 ## What is the origin of the Scouter?
