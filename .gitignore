@@ -89,6 +89,6 @@ typings/
 out/
 
 # Test materials
-server_log.txt
-playground-pickscreen.html
+test_log.txt
+./test_log.txt
 trashcode.js

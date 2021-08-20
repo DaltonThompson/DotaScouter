@@ -1,10 +1,11 @@
+let testMode;
+let testLog = 'test_log.txt';
+
 // dependencies
 const chokidar = require('chokidar'), fs = require('fs'), path = require('path'), os = require('os'), fetch = require('node-fetch');
 
 // External paths
 let server_log = os.homedir + "/Library/Application Support/Steam/SteamApps/common/dota 2 beta/game/dota/server_log.txt";
-// Alt declaration if testing outside of live game
-// let server_log = "./server_log.txt"
 
 // DOM references
 const optionsContainer = document.querySelector('.options_grid');
@@ -14,30 +15,36 @@ let globalData = {};
 
 // Declares number of players to evaluate. Only change if testing.
 let playersTotalInGame = 10;
+let targetPath = server_log;
 
-function initializeHeroCards(){
-    for (let i = 0; i < globalData.heroStats.length; i++) {
-        for (let j = 0; j < 10; j++) {
-            // Set up element to insert.
-            let heroCard = document.createElement("div"), imageInsert = document.createAttribute("style");
-            heroCard.className = `heroCard grid_column${j}`;
-            imageInsert.value = i < globalData.heroStats.length - 1 ? `background-image: url(https://steamcdn-a.akamaihd.net${globalData.heroStats[i].img})` : `background-image: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dawnbreaker.png)`;
-            heroCard.setAttributeNode(imageInsert);
-            optionsContainer.appendChild(heroCard);
-            heroCard.classList.add(`hero` + globalData.heroStats[i].id);
-        }
-    }
+function enterTestMode() {
+    testMode = true;
+    playersTotalInGame = 1;
+    watcher.unwatch(targetPath);
+    targetPath = testLog;
+    watcher;
+    readLog();
+}
+
+function exitTestMode() {
+    testMode = false;
+    playersTotalInGame = 10;
+    watcher.unwatch(targetPath);
+    targetPath = server_log;
+    watcher;
+    readLog();
 }
 
 // Observes log for all events
-chokidar.watch(server_log).on('all', (event, path) => {
-    console.log(event, path, readLog());
+const watcher = chokidar.watch(targetPath).on('all', (event, path) => {
+        console.log(event, path, readLog());
 });
+watcher;
 
-// function from dotabuddy. Finds last line of server_log, calls parselog on it.
+// function from dotabuddy. Finds last line of targetPath, calls parselog on it.
 function readLog(){
     let lines = [];
-    fs.readFileSync(server_log).toString().split("\n").forEach(line => lines.push(line));
+    fs.readFileSync(targetPath).toString().split("\n").forEach(line => lines.push(line));
     return this.parseLog(lines[lines.length - 1], lines[lines.length - 2], lines[lines.length - 3]);
 };
 
@@ -47,7 +54,7 @@ let steamIds;
 function parseLog(lastLine, penultLine, secondLastLine) {
 
     let regex = /(.*?) - (.*?): (.*?) \(Lobby (\d+) (\w+) (.*?)\)/, match, lastLineMatch = lastLine.match(regex), penultLineMatch, secondLastLineMatch;
-    
+
     if (penultLine) penultLineMatch = penultLine.match(regex);
     if (secondLastLine) secondLastLineMatch = secondLastLine.match(regex);
 
@@ -96,6 +103,20 @@ const requestHeroStats = async () => {
         console.log(error.response);
     }
 };
+
+function initializeHeroCards(){
+    for (let i = 0; i < globalData.heroStats.length; i++) {
+        for (let j = 0; j < 10; j++) {
+            // Set up element to insert.
+            let heroCard = document.createElement("div"), imageInsert = document.createAttribute("style");
+            heroCard.className = `heroCard grid_column${j}`;
+            imageInsert.value = i < globalData.heroStats.length - 1 ? `background-image: url(https://steamcdn-a.akamaihd.net${globalData.heroStats[i].img})` : `background-image: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dawnbreaker.png)`;
+            heroCard.setAttributeNode(imageInsert);
+            optionsContainer.appendChild(heroCard);
+            heroCard.classList.add(`hero` + globalData.heroStats[i].id);
+        }
+    }
+}
 
 const promiseChain = async () => {
     const a = await requestHeroStats();
