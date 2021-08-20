@@ -38,7 +38,7 @@ chokidar.watch(server_log).on('all', (event, path) => {
 function readLog(){
     let lines = [];
     fs.readFileSync(server_log).toString().split("\n").forEach(line => lines.push(line));
-    return this.parseLog(lines[lines.length - 2], lines[lines.length - 2], lines[lines.length - 3]);
+    return this.parseLog(lines[lines.length - 1], lines[lines.length - 2], lines[lines.length - 3]);
 };
 
 let steamIds;
@@ -46,7 +46,10 @@ let steamIds;
 // function from dotabuddy. Parses log into steamIds, additional data includes date, time, game mode.
 function parseLog(lastLine, penultLine, secondLastLine) {
 
-    let regex = /(.*?) - (.*?): (.*?) \(Lobby (\d+) (\w+) (.*?)\)/, match, lastLineMatch = lastLine.match(regex), penultLineMatch = penultLine.match(regex), secondLastLineMatch = secondLastLine.match(regex);
+    let regex = /(.*?) - (.*?): (.*?) \(Lobby (\d+) (\w+) (.*?)\)/, match, lastLineMatch = lastLine.match(regex), penultLineMatch, secondLastLineMatch;
+    
+    if (penultLine) penultLineMatch = penultLine.match(regex);
+    if (secondLastLine) secondLastLineMatch = secondLastLine.match(regex);
 
     if (lastLineMatch) {
         console.log('Ongoing game is being processed.');
