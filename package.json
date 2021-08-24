@@ -9,7 +9,8 @@
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
-    "lint": "echo \"No linting configured\""
+    "lint": "echo \"No linting configured\"",
+    "sass": "node-sass -w src/scss/ -o src/css/ --recursive"
   },
   "keywords": [],
   "author": "daltonthompson",
@@ -46,7 +47,8 @@
   "dependencies": {
     "chokidar": "^3.5.2",
     "electron-squirrel-startup": "^1.0.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "node-sass": "^6.0.1"
   },
   "devDependencies": {
     "@electron-forge/cli": "^6.0.0-beta.59",

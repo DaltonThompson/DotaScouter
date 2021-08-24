@@ -6,37 +6,25 @@
   font-weight: normal;
   font-style: normal; }
 
+/* Original Dota2 Colors */
+/*$player0-color: rgb(48, 116, 249);
+$player1-color: rgb(102, 255, 192);
+$player2-color: rgb(189, 0, 183);
+$player3-color: rgb(248, 245, 10);
+$player4-color: rgb(255, 105, 1);
+$player5-color: rgb(255, 136, 197);
+$player6-color: rgb(162, 179, 73);
+$player7-color: rgb(99, 218, 250);
+$player8-color: rgb(1, 131, 31);
+$player9-color: rgb(159, 107, 0); */
+/* Adjusted colors for visibility, to 100% saturation & 35% lightness */
 * {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-family: "Radiance",'Open Sans', sans-serif;
-  --background-dark: rgb(34, 34, 34);
-  --background-light: rgb(68, 68, 68);
-  /* Original Dota2 Colors */
-  /*--player0-color: rgb(48, 116, 249);
-    --player1-color: rgb(102, 255, 192);
-    --player2-color: rgb(189, 0, 183);
-    --player3-color: rgb(248, 245, 10);
-    --player4-color: rgb(255, 105, 1);
-    --player5-color: rgb(255, 136, 197);
-    --player6-color: rgb(162, 179, 73);
-    --player7-color: rgb(99, 218, 250);
-    --player8-color: rgb(1, 131, 31);
-    --player9-color: rgb(159, 107, 0); */
-  /* Adjusted colors for visibility, to 100% saturation & 35% lightness */
-  --player0-color: hsl(220deg 100% 35%);
-  --player1-color: hsl(155deg 100% 35%);
-  --player2-color: hsl(302deg 100% 35%);
-  --player3-color: hsl(59deg 100% 35%);
-  --player4-color: hsl(25deg 100% 35%);
-  --player5-color: hsl(329deg 100% 35%);
-  --player6-color: hsl(70deg 100% 35%);
-  --player7-color: hsl(193deg 100% 35%);
-  --player8-color: hsl(134deg 100% 26%);
-  --player9-color: hsl(40deg 100% 35%);
   transition: all .3s ease-in; }
 
 body {
-  background: linear-gradient(var(--background-dark), var(--background-light));
+  background: linear-gradient(#222222, #444444);
   background-repeat: no-repeat;
   background-size: cover;
   /* Just for easy math, width is set */
@@ -53,7 +41,7 @@ body {
   position: sticky;
   top: 0;
   padding: 22px 1em 1em 1em;
-  background-color: var(--background-dark);
+  background-color: #222222;
   display: grid;
   grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
   grid-gap: 0.5em;
@@ -61,34 +49,34 @@ body {
 
 /* Drop shadow: might add back if colors can move to similar saturation/brightness. 
     #pick0main {
-        filter: drop-shadow(0 0 5px var(--player0-color));
+        filter: drop-shadow(0 0 5px $player0-color);
     }
     #pick1main {
-        filter: drop-shadow(0 0 5px var(--player1-color));
+        filter: drop-shadow(0 0 5px $player1-color);
     }
     #pick2main {
-        filter: drop-shadow(0 0 5px var(--player2-color));
+        filter: drop-shadow(0 0 5px $player2-color);
     }
     #pick3main {
-        filter: drop-shadow(0 0 5px var(--player3-color));
+        filter: drop-shadow(0 0 5px $player3-color);
     }
     #pick4main {
-        filter: drop-shadow(0 0 5px var(--player4-color));
+        filter: drop-shadow(0 0 5px $player4-color);
     }
     #pick5main {
-        filter: drop-shadow(0 0 5px var(--player5-color));
+        filter: drop-shadow(0 0 5px $player5-color);
     }
     #pick6main {
-        filter: drop-shadow(0 0 5px var(--player6-color));
+        filter: drop-shadow(0 0 5px $player6-color);
     }
     #pick7main {
-        filter: drop-shadow(0 0 5px var(--player7-color));
+        filter: drop-shadow(0 0 5px $player7-color);
     }
     #pick8main {
-        filter: drop-shadow(0 0 5px var(--player8-color));
+        filter: drop-shadow(0 0 5px $player8-color);
     }
     #pick9main {
-        filter: drop-shadow(0 0 5px var(--player9-color));
+        filter: drop-shadow(0 0 5px $player9-color);
     }
 */
 .player_border {
@@ -97,34 +85,34 @@ body {
   text-align: center; }
 
 .player0__border {
-  background: linear-gradient(79deg, var(--background-dark), var(--player0-color), var(--player0-color), var(--background-dark)); }
+  background: linear-gradient(79deg, #222222, #003cb3, #003cb3, #222222); }
 
 .player1__border {
-  background: linear-gradient(79deg, var(--background-dark), var(--player1-color), var(--player1-color), var(--background-dark)); }
+  background: linear-gradient(79deg, #222222, #00b368, #00b368, #222222); }
 
 .player2__border {
-  background: linear-gradient(79deg, var(--background-dark), var(--player2-color), var(--player2-color), var(--background-dark)); }
+  background: linear-gradient(79deg, #222222, #b300ad, #b300ad, #222222); }
 
 .player3__border {
-  background: linear-gradient(79deg, var(--background-dark), var(--player3-color), var(--player3-color), var(--background-dark)); }
+  background: linear-gradient(79deg, #222222, #b3b000, #b3b000, #222222); }
 
 .player4__border {
-  background: linear-gradient(79deg, var(--background-dark), var(--player4-color), var(--player4-color), var(--background-dark)); }
+  background: linear-gradient(79deg, #222222, #b34a00, #b34a00, #222222); }
 
 .player5__border {
-  background: linear-gradient(101deg, var(--background-dark), var(--player5-color), var(--player5-color), var(--background-dark)); }
+  background: linear-gradient(101deg, #222222, #b3005c, #b3005c, #222222); }
 
 .player6__border {
-  background: linear-gradient(101deg, var(--background-dark), var(--player6-color), var(--player6-color), var(--background-dark)); }
+  background: linear-gradient(101deg, #222222, #95b300, #95b300, #222222); }
 
 .player7__border {
-  background: linear-gradient(101deg, var(--background-dark), var(--player7-color), var(--player7-color), var(--background-dark)); }
+  background: linear-gradient(101deg, #222222, #008cb3, #008cb3, #222222); }
 
 .player8__border {
-  background: linear-gradient(101deg, var(--background-dark), var(--player8-color), var(--player8-color), var(--background-dark)); }
+  background: linear-gradient(101deg, #222222, #00b32a, #00b32a, #222222); }
 
 .player9__border {
-  background: linear-gradient(101deg, var(--background-dark), var(--player9-color), var(--player9-color), var(--background-dark)); }
+  background: linear-gradient(101deg, #222222, #b37700, #b37700, #222222); }
 
 .pick {
   /* 'display: none' until picking functionality can be added. */
@@ -132,7 +120,7 @@ body {
   aspect-ratio: 16/9;
   background-repeat: no-repeat;
   background-size: cover;
-  background-image: linear-gradient(var(--background-dark), var(--background-light));
+  background-image: linear-gradient(#222222, #444444);
   /* make light even lighter? #777 */
   position: relative; }
 
