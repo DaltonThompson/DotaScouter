@@ -99,12 +99,37 @@ function parseLog(lastLine, penultLine, secondLastLine) {
     return promiseChain();
 };
 
+const promiseChain = async () => {
+    await requestHeroStats();
+    await Promise.all([iterateThroughPlayers(requestPlayerData),initializeHeroCards()]);
+    orderCards();
+    await iterateThroughPlayers(requestPlayerPersonal);
+    iterateThroughPlayers(createPlayerCards);
+};
+
 const requestHeroStats = async () => {
     try {
         const response = await fetch(`https://api.opendota.com/api/heroStats`)
         globalData.heroStats = await response.json()
     } catch (error) {
         console.log(error.response);
+    }
+};
+
+const iterateThroughPlayers = async(callback) => {
+    let promiseArray = [];
+    for (let i = 0; i < playersTotalInGame; i++) promiseArray.push(callback(i));
+    return Promise.all(promiseArray);
+};
+
+const requestPlayerData = async(i) => {
+    try {
+        const response = await fetch(`https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersionMin}&gameVersionId=${gameVersionMax}`)
+        globalData.player[i].performance = await response.json();
+        globalData.player[i].access = true;
+    } catch (error) {
+        globalData.player[i].access = false;
+        console.log(error);
     }
 };
 
@@ -121,33 +146,6 @@ function initializeHeroCards(){
     }
 }
 
-const promiseChain = async () => {
-    const a = await requestHeroStats();
-    const e = await initializeHeroCards();
-    const b = await iterateThroughPlayers(requestPlayerPersonal);
-    const c = await iterateThroughPlayers(requestPlayerData);
-    const d = await orderCards();
-    const g = await iterateThroughPlayers(createPlayerCards);
-    return [a, e, b, d, c, g];
-};
-
-const requestPlayerData = async(i) => {
-    try {
-        const response = await fetch(`https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersionMin}&gameVersionId=${gameVersionMax}`)
-        globalData.player[i].performance = await response.json();
-        globalData.player[i].access = true;
-    } catch (error) {
-        globalData.player[i].access = false;
-        console.log(error);
-    }
-};
-
-const iterateThroughPlayers = async(callback) => {
-    let promiseArray = [];
-    for (let i = 0; i < playersTotalInGame; i++) promiseArray.push(callback(i));
-    return Promise.all(promiseArray);
-};
-
 const requestPlayerPersonal = async(i) => {
     try {
         const response = await fetch(`https://api.stratz.com/api/v1/Player/${steamIds[i]}`)
@@ -156,42 +154,6 @@ const requestPlayerPersonal = async(i) => {
     } catch (error) {
         globalData.player[i].stratzAccess = false;
         console.log(error.response);
-    }
-}
-
-const createPlayerCards = (i) => {
-    if (globalData.player[i].stratzAccess) {
-        
-        globalData.player[i].personal.hasOwnProperty('steamAccount')
-            ? document.querySelector(`.player${i} .player_name`).innerText = globalData.player[i].personal.steamAccount.name
-            : console.log(i + ' could not receive avatar or persona name');
-
-        let playeri = document.querySelector(`.player${i} .player_rank`);
-        if (globalData.player[i].personal.steamAccount.seasonRank !== undefined) {
-            let tier = globalData.player[i].personal.steamAccount.seasonRank;
-            let star = Math.floor((tier / 1) % 10), medal = Math.round(tier / 10);
-            if (medal === 1) {
-                playeri.innerText = `Herald ${star}`;
-            } else if (medal === 2) {
-                playeri.innerText = `Guardian ${star}`;
-            } else if (medal === 3) {
-                playeri.innerText = `Crusader ${star}`;
-            } else if (medal === 4) {
-                playeri.innerText = `Archon ${star}`;
-            } else if (medal === 5) {
-                playeri.innerText = `Legend ${star}`;
-            } else if (medal === 6) {
-                playeri.innerText = `Ancient ${star}`;
-            } else if (medal === 7) {
-                playeri.innerText = `Divine ${star}`;
-            } else if (medal === 8) {
-                playeri.innerText = `Immortal ${star}`;
-            } else {
-                playeri.innerText = `UNKNOWN`;
-            }
-        } else {
-            playeri.innerText = `UNKNOWN`;
-        }
     }
 }
 
@@ -232,5 +194,41 @@ function getWinAttempt(hero,i,playerAsHero) {
         // Need 4 games on a hero to be at equal weight with meta.
         obj[`weightedScore`] = ( ( playerAsHero.matchCount * convertedIMP ) + playerAsHero.winCount + (8 * hero.winRate)) / ( (2 * playerAsHero.matchCount) + 8);
         hero.playerWeights[i] = obj;
+    }
+}
+
+const createPlayerCards = (i) => {
+    if (globalData.player[i].stratzAccess) {
+        
+        globalData.player[i].personal.hasOwnProperty('steamAccount')
+            ? document.querySelector(`.player${i} .player_name`).innerText = globalData.player[i].personal.steamAccount.name
+            : console.log(i + ' could not receive avatar or persona name');
+
+        let playeri = document.querySelector(`.player${i} .player_rank`);
+        if (globalData.player[i].personal.steamAccount.seasonRank !== undefined) {
+            let tier = globalData.player[i].personal.steamAccount.seasonRank;
+            let star = Math.floor((tier / 1) % 10), medal = Math.round(tier / 10);
+            if (medal === 1) {
+                playeri.innerText = `Herald ${star}`;
+            } else if (medal === 2) {
+                playeri.innerText = `Guardian ${star}`;
+            } else if (medal === 3) {
+                playeri.innerText = `Crusader ${star}`;
+            } else if (medal === 4) {
+                playeri.innerText = `Archon ${star}`;
+            } else if (medal === 5) {
+                playeri.innerText = `Legend ${star}`;
+            } else if (medal === 6) {
+                playeri.innerText = `Ancient ${star}`;
+            } else if (medal === 7) {
+                playeri.innerText = `Divine ${star}`;
+            } else if (medal === 8) {
+                playeri.innerText = `Immortal ${star}`;
+            } else {
+                playeri.innerText = `UNKNOWN`;
+            }
+        } else {
+            playeri.innerText = `UNKNOWN`;
+        }
     }
 }

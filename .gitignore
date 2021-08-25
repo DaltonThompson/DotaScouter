@@ -92,3 +92,4 @@ out/
 test_log.txt
 ./test_log.txt
 trashcode.js
+performance-tests
