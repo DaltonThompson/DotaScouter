@@ -1,11 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap");
-@font-face {
-  font-family: "Radiance";
-  src: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.eot");
-  src: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.eot?#iefix") format("embedded-opentype"), url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.woff") format("woff"), url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.ttf") format("truetype"), url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.svg#ywftsvg") format("svg");
-  font-weight: normal;
-  font-style: normal; }
-
 /* Original Dota2 Colors */
 /*$player0-color: rgb(48, 116, 249);
 $player1-color: rgb(102, 255, 192);
@@ -18,101 +10,638 @@ $player7-color: rgb(99, 218, 250);
 $player8-color: rgb(1, 131, 31);
 $player9-color: rgb(159, 107, 0); */
 /* Adjusted colors for visibility, to 100% saturation & 35% lightness */
+.hero1 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/antimage_full.png?);
+}
+
+.hero2 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/axe_full.png?);
+}
+
+.hero3 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/bane_full.png?);
+}
+
+.hero4 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/bloodseeker_full.png?);
+}
+
+.hero5 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/crystal_maiden_full.png?);
+}
+
+.hero6 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/drow_ranger_full.png?);
+}
+
+.hero7 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/earthshaker_full.png?);
+}
+
+.hero8 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/juggernaut_full.png?);
+}
+
+.hero9 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/mirana_full.png?);
+}
+
+.hero10 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/morphling_full.png?);
+}
+
+.hero11 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/nevermore_full.png?);
+}
+
+.hero12 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/phantom_lancer_full.png?);
+}
+
+.hero13 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/puck_full.png?);
+}
+
+.hero14 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/pudge_full.png?);
+}
+
+.hero15 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/razor_full.png?);
+}
+
+.hero16 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/sand_king_full.png?);
+}
+
+.hero17 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/storm_spirit_full.png?);
+}
+
+.hero18 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/sven_full.png?);
+}
+
+.hero19 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/tiny_full.png?);
+}
+
+.hero20 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/vengefulspirit_full.png?);
+}
+
+.hero21 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/windrunner_full.png?);
+}
+
+.hero22 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/zuus_full.png?);
+}
+
+.hero23 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/kunkka_full.png?);
+}
+
+.hero25 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/lina_full.png?);
+}
+
+.hero26 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/lion_full.png?);
+}
+
+.hero27 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/shadow_shaman_full.png?);
+}
+
+.hero28 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/slardar_full.png?);
+}
+
+.hero29 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/tidehunter_full.png?);
+}
+
+.hero30 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/witch_doctor_full.png?);
+}
+
+.hero31 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/lich_full.png?);
+}
+
+.hero32 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/riki_full.png?);
+}
+
+.hero33 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/enigma_full.png?);
+}
+
+.hero34 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/tinker_full.png?);
+}
+
+.hero35 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/sniper_full.png?);
+}
+
+.hero36 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/necrolyte_full.png?);
+}
+
+.hero37 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/warlock_full.png?);
+}
+
+.hero38 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/beastmaster_full.png?);
+}
+
+.hero39 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/queenofpain_full.png?);
+}
+
+.hero40 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/venomancer_full.png?);
+}
+
+.hero41 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/faceless_void_full.png?);
+}
+
+.hero42 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/skeleton_king_full.png?);
+}
+
+.hero43 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/death_prophet_full.png?);
+}
+
+.hero44 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/phantom_assassin_full.png?);
+}
+
+.hero45 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/pugna_full.png?);
+}
+
+.hero46 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/templar_assassin_full.png?);
+}
+
+.hero47 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/viper_full.png?);
+}
+
+.hero48 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/luna_full.png?);
+}
+
+.hero49 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/dragon_knight_full.png?);
+}
+
+.hero50 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/dazzle_full.png?);
+}
+
+.hero51 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/rattletrap_full.png?);
+}
+
+.hero52 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/leshrac_full.png?);
+}
+
+.hero53 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/furion_full.png?);
+}
+
+.hero54 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/life_stealer_full.png?);
+}
+
+.hero55 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/dark_seer_full.png?);
+}
+
+.hero56 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/clinkz_full.png?);
+}
+
+.hero57 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/omniknight_full.png?);
+}
+
+.hero58 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/enchantress_full.png?);
+}
+
+.hero59 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/huskar_full.png?);
+}
+
+.hero60 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/night_stalker_full.png?);
+}
+
+.hero61 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/broodmother_full.png?);
+}
+
+.hero62 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/bounty_hunter_full.png?);
+}
+
+.hero63 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/weaver_full.png?);
+}
+
+.hero64 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/jakiro_full.png?);
+}
+
+.hero65 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/batrider_full.png?);
+}
+
+.hero66 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/chen_full.png?);
+}
+
+.hero67 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/spectre_full.png?);
+}
+
+.hero68 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/ancient_apparition_full.png?);
+}
+
+.hero69 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/doom_bringer_full.png?);
+}
+
+.hero70 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/ursa_full.png?);
+}
+
+.hero71 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/spirit_breaker_full.png?);
+}
+
+.hero72 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/gyrocopter_full.png?);
+}
+
+.hero73 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/alchemist_full.png?);
+}
+
+.hero74 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/invoker_full.png?);
+}
+
+.hero75 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/silencer_full.png?);
+}
+
+.hero76 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/obsidian_destroyer_full.png?);
+}
+
+.hero77 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/lycan_full.png?);
+}
+
+.hero78 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/brewmaster_full.png?);
+}
+
+.hero79 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/shadow_demon_full.png?);
+}
+
+.hero80 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/lone_druid_full.png?);
+}
+
+.hero81 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/chaos_knight_full.png?);
+}
+
+.hero82 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/meepo_full.png?);
+}
+
+.hero83 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/treant_full.png?);
+}
+
+.hero84 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/ogre_magi_full.png?);
+}
+
+.hero85 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/undying_full.png?);
+}
+
+.hero86 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/rubick_full.png?);
+}
+
+.hero87 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/disruptor_full.png?);
+}
+
+.hero88 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/nyx_assassin_full.png?);
+}
+
+.hero89 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/naga_siren_full.png?);
+}
+
+.hero90 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/keeper_of_the_light_full.png?);
+}
+
+.hero91 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/wisp_full.png?);
+}
+
+.hero92 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/visage_full.png?);
+}
+
+.hero93 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/slark_full.png?);
+}
+
+.hero94 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/medusa_full.png?);
+}
+
+.hero95 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/troll_warlord_full.png?);
+}
+
+.hero96 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/centaur_full.png?);
+}
+
+.hero97 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/magnataur_full.png?);
+}
+
+.hero98 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/shredder_full.png?);
+}
+
+.hero99 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/bristleback_full.png?);
+}
+
+.hero100 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/tusk_full.png?);
+}
+
+.hero101 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/skywrath_mage_full.png?);
+}
+
+.hero102 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/abaddon_full.png?);
+}
+
+.hero103 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/elder_titan_full.png?);
+}
+
+.hero104 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/legion_commander_full.png?);
+}
+
+.hero105 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/techies_full.png?);
+}
+
+.hero106 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/ember_spirit_full.png?);
+}
+
+.hero107 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/earth_spirit_full.png?);
+}
+
+.hero108 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/abyssal_underlord_full.png?);
+}
+
+.hero109 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/terrorblade_full.png?);
+}
+
+.hero110 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/phoenix_full.png?);
+}
+
+.hero111 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/oracle_full.png?);
+}
+
+.hero112 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/winter_wyvern_full.png?);
+}
+
+.hero113 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/arc_warden_full.png?);
+}
+
+.hero114 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/monkey_king_full.png?);
+}
+
+.hero119 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/dark_willow_full.png?);
+}
+
+.hero120 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/pangolier_full.png?);
+}
+
+.hero121 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/grimstroke_full.png?);
+}
+
+.hero123 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/hoodwink_full.png?);
+}
+
+.hero126 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/void_spirit_full.png?);
+}
+
+.hero128 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/snapfire_full.png?);
+}
+
+.hero129 {
+  background-image: url(https://steamcdn-a.akamaihd.net/apps/dota2/images/heroes/mars_full.png?);
+}
+
+.hero135 {
+  background-image: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dawnbreaker.png);
+}
+
+@font-face {
+  font-family: "Radiance";
+  src: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.eot");
+  src: url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.eot?#iefix") format("embedded-opentype"), url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.woff") format("woff"), url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.ttf") format("truetype"), url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.svg#ywftsvg") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
 * {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-family: "Radiance",'Open Sans', sans-serif;
-  transition: all .3s ease-in; }
+  font-family: "Radiance", "Open Sans", sans-serif;
+}
 
 body {
-  background: linear-gradient(#222222, #444444);
+  background: linear-gradient(#212121, #454545);
   background-repeat: no-repeat;
   background-size: cover;
   /* Just for easy math, width is set */
-  margin: 0; }
+  margin: 0;
+}
 
 .frame-drag {
-  -webkit-app-region: drag;
   position: absolute;
   height: 22px;
   top: 0;
-  width: 100%; }
+  width: 100%;
+}
 
 #players {
   position: sticky;
   top: 0;
   padding: 22px 1em 1em 1em;
-  background-color: #222222;
+  background-color: #212121;
   display: grid;
   grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
   grid-gap: 0.5em;
-  grid-auto-flow: column; }
+  grid-auto-flow: column;
+}
 
 /* Drop shadow: might add back if colors can move to similar saturation/brightness. 
     #pick0main {
-        filter: drop-shadow(0 0 5px $player0-color);
+        filter: drop-shadow(0 0 5px colors.$player0-color);
     }
     #pick1main {
-        filter: drop-shadow(0 0 5px $player1-color);
+        filter: drop-shadow(0 0 5px colors.$player1-color);
     }
     #pick2main {
-        filter: drop-shadow(0 0 5px $player2-color);
+        filter: drop-shadow(0 0 5px colors.$player2-color);
     }
     #pick3main {
-        filter: drop-shadow(0 0 5px $player3-color);
+        filter: drop-shadow(0 0 5px colors.$player3-color);
     }
     #pick4main {
-        filter: drop-shadow(0 0 5px $player4-color);
+        filter: drop-shadow(0 0 5px colors.$player4-color);
     }
     #pick5main {
-        filter: drop-shadow(0 0 5px $player5-color);
+        filter: drop-shadow(0 0 5px colors.$player5-color);
     }
     #pick6main {
-        filter: drop-shadow(0 0 5px $player6-color);
+        filter: drop-shadow(0 0 5px colors.$player6-color);
     }
     #pick7main {
-        filter: drop-shadow(0 0 5px $player7-color);
+        filter: drop-shadow(0 0 5px colors.$player7-color);
     }
     #pick8main {
-        filter: drop-shadow(0 0 5px $player8-color);
+        filter: drop-shadow(0 0 5px colors.$player8-color);
     }
     #pick9main {
-        filter: drop-shadow(0 0 5px $player9-color);
+        filter: drop-shadow(0 0 5px colors.$player9-color);
     }
 */
 .player_border {
   /* padding: 0 0 12px 0; */
   margin: 5px 0;
-  text-align: center; }
+  text-align: center;
+}
 
+.center_column {
+  grid-column: 6;
+}
+
+.player0 {
+  grid-column: 1;
+}
 .player0__border {
-  background: linear-gradient(79deg, #222222, #003cb3, #003cb3, #222222); }
+  background: linear-gradient(79deg, #212121, #003cb3, #003cb3, #212121);
+}
 
+.player1 {
+  grid-column: 2;
+}
 .player1__border {
-  background: linear-gradient(79deg, #222222, #00b368, #00b368, #222222); }
+  background: linear-gradient(79deg, #212121, #00b368, #00b368, #212121);
+}
 
+.player2 {
+  grid-column: 3;
+}
 .player2__border {
-  background: linear-gradient(79deg, #222222, #b300ad, #b300ad, #222222); }
+  background: linear-gradient(79deg, #212121, #b300ad, #b300ad, #212121);
+}
 
+.player3 {
+  grid-column: 4;
+}
 .player3__border {
-  background: linear-gradient(79deg, #222222, #b3b000, #b3b000, #222222); }
+  background: linear-gradient(79deg, #212121, #b3b000, #b3b000, #212121);
+}
 
+.player4 {
+  grid-column: 5;
+}
 .player4__border {
-  background: linear-gradient(79deg, #222222, #b34a00, #b34a00, #222222); }
+  background: linear-gradient(79deg, #212121, #b34a00, #b34a00, #212121);
+}
 
+.player5 {
+  grid-column: 7;
+}
 .player5__border {
-  background: linear-gradient(101deg, #222222, #b3005c, #b3005c, #222222); }
+  background: linear-gradient(101deg, #212121, #b3005c, #b3005c, #212121);
+}
 
+.player6 {
+  grid-column: 8;
+}
 .player6__border {
-  background: linear-gradient(101deg, #222222, #95b300, #95b300, #222222); }
+  background: linear-gradient(101deg, #212121, #95b300, #95b300, #212121);
+}
 
+.player7 {
+  grid-column: 9;
+}
 .player7__border {
-  background: linear-gradient(101deg, #222222, #008cb3, #008cb3, #222222); }
+  background: linear-gradient(101deg, #212121, #008cb3, #008cb3, #212121);
+}
 
+.player8 {
+  grid-column: 10;
+}
 .player8__border {
-  background: linear-gradient(101deg, #222222, #00b32a, #00b32a, #222222); }
+  background: linear-gradient(101deg, #212121, #00b32a, #00b32a, #212121);
+}
 
+.player9 {
+  grid-column: 11;
+}
 .player9__border {
-  background: linear-gradient(101deg, #222222, #b37700, #b37700, #222222); }
+  background: linear-gradient(101deg, #212121, #b37700, #b37700, #212121);
+}
 
 .pick {
   /* 'display: none' until picking functionality can be added. */
@@ -120,14 +649,16 @@ body {
   aspect-ratio: 16/9;
   background-repeat: no-repeat;
   background-size: cover;
-  background-image: linear-gradient(#222222, #444444);
+  background-image: linear-gradient(#212121, #454545);
   /* make light even lighter? #777 */
-  position: relative; }
+  position: relative;
+}
 
 .player_rank {
   color: #fff;
   text-shadow: 0 -1px 4px black;
-  font-size: 12px; }
+  font-size: 12px;
+}
 
 .player_name {
   position: static;
@@ -140,7 +671,8 @@ body {
   box-sizing: border-box;
   display: inline-block;
   text-shadow: 0 0 2px;
-  vertical-align: bottom; }
+  vertical-align: bottom;
+}
 
 /* Rank images: Unused for now
     .rankCard {
@@ -159,21 +691,15 @@ body {
     } 
 */
 #options {
-  padding: 0 1em 1em 1em; }
+  padding: 0 1em 1em 1em;
+}
 
 .options_grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
   grid-gap: 0.5em;
-  grid-auto-flow: column; }
-
-.options_column {
-  width: 20%;
-  position: static;
-  display: grid;
-  grid-row-gap: 5px;
-  padding: 5px;
-  box-sizing: border-box; }
+  grid-auto-flow: column;
+}
 
 .heroCard {
   background-size: cover;
@@ -185,37 +711,7 @@ body {
   box-shadow: 0 2px 5px 0px black;
   border-radius: 0.5em;
   width: 100%;
-  aspect-ratio: 16/9; }
+  aspect-ratio: 16/9;
+}
 
-.grid_column0 {
-  grid-column: 1; }
-
-.grid_column1 {
-  grid-column: 2; }
-
-.grid_column2 {
-  grid-column: 3; }
-
-.grid_column3 {
-  grid-column: 4; }
-
-.grid_column4 {
-  grid-column: 5; }
-
-.center_column {
-  grid-column: 6; }
-
-.grid_column5 {
-  grid-column: 7; }
-
-.grid_column6 {
-  grid-column: 8; }
-
-.grid_column7 {
-  grid-column: 9; }
-
-.grid_column8 {
-  grid-column: 10; }
-
-.grid_column9 {
-  grid-column: 11; }
+/*# sourceMappingURL=index.css.map */

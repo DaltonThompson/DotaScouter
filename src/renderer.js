@@ -113,12 +113,11 @@ function initializeHeroCards(){
     for (let i = 0; i < globalData.heroStats.length; i++) {
         for (let j = 0; j < 10; j++) {
             // Set up element to insert.
-            let heroCard = document.createElement("div"), imageInsert = document.createAttribute("style");
-            heroCard.className = `heroCard grid_column${j}`;
-            imageInsert.value = i < globalData.heroStats.length - 1 ? `background-image: url(https://steamcdn-a.akamaihd.net${globalData.heroStats[i].img})` : `background-image: url(https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/dawnbreaker.png)`;
-            heroCard.setAttributeNode(imageInsert);
+            let heroCard = document.createElement("div");
+            heroCard.className = `heroCard player${j}`;
             optionsContainer.appendChild(heroCard);
             heroCard.classList.add(`hero` + globalData.heroStats[i].id);
+            heroCard.setAttribute('id', `player${j}__hero` + globalData.heroStats[i].id);
         }
     }
 }
@@ -219,7 +218,7 @@ function addPlayerProb(hero,idOfHero){
             obj[`weightedScore`] = hero.winRate;
             hero.playerWeights[i] = obj;
         }
-        document.querySelector(`div#options > div.heroCard.hero${idOfHero}.grid_column${i}`).style.order = Math.round(hero.playerWeights[i].weightedScore*-1000);
+        document.getElementById(`player${i}__hero${idOfHero}`).style.order = Math.round(hero.playerWeights[i].weightedScore*-1000);
     }
 };
 

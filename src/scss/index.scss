@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+@use "colors";
+@use "hero-images";
 @font-face {
     font-family:"Radiance";
     src:url("https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance.eot");
@@ -6,48 +7,18 @@
     font-weight:normal;
     font-style:normal;
 }
-
-$background-dark: rgb(34, 34, 34);
-$background-light: rgb(68, 68, 68);
-/* Original Dota2 Colors */
-/*$player0-color: rgb(48, 116, 249);
-$player1-color: rgb(102, 255, 192);
-$player2-color: rgb(189, 0, 183);
-$player3-color: rgb(248, 245, 10);
-$player4-color: rgb(255, 105, 1);
-$player5-color: rgb(255, 136, 197);
-$player6-color: rgb(162, 179, 73);
-$player7-color: rgb(99, 218, 250);
-$player8-color: rgb(1, 131, 31);
-$player9-color: rgb(159, 107, 0); */
-
-/* Adjusted colors for visibility, to 100% saturation & 35% lightness */
-$player0-color: hsl(220deg, 100%, 35%);
-$player1-color: hsl(155deg, 100%, 35%);
-$player2-color: hsl(302deg, 100%, 35%);
-$player3-color: hsl(59deg, 100%, 35%);
-$player4-color: hsl(25deg, 100%, 35%);
-$player5-color: hsl(329deg, 100%, 35%);
-$player6-color: hsl(70deg, 100%, 35%);
-$player7-color: hsl(193deg, 100%, 35%);
-$player8-color: hsl(134deg, 100%, 35%);
-$player9-color: hsl(40deg, 100%, 35%);
 * {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-family: "Radiance",'Open Sans', sans-serif;
-    transition: all .3s ease-in;
+    // transition: all .3s ease-in;
 }
-
 body {
-    background: linear-gradient($background-dark, $background-light);
+    background: linear-gradient(colors.$background-dark, colors.$background-light);
     background-repeat: no-repeat;
     background-size: cover;
     /* Just for easy math, width is set */
     margin: 0;
 }
-
 .frame-drag {
-    -webkit-app-region: drag;
     position: absolute;
     height: 22px;
     top: 0;
@@ -57,43 +28,42 @@ body {
     position: sticky;
     top: 0;
     padding: 22px 1em 1em 1em;
-    background-color: $background-dark;
+    background-color: colors.$background-dark;
     display: grid;
     grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
     grid-gap: 0.5em;
     grid-auto-flow: column;
 }
-
 /* Drop shadow: might add back if colors can move to similar saturation/brightness. 
     #pick0main {
-        filter: drop-shadow(0 0 5px $player0-color);
+        filter: drop-shadow(0 0 5px colors.$player0-color);
     }
     #pick1main {
-        filter: drop-shadow(0 0 5px $player1-color);
+        filter: drop-shadow(0 0 5px colors.$player1-color);
     }
     #pick2main {
-        filter: drop-shadow(0 0 5px $player2-color);
+        filter: drop-shadow(0 0 5px colors.$player2-color);
     }
     #pick3main {
-        filter: drop-shadow(0 0 5px $player3-color);
+        filter: drop-shadow(0 0 5px colors.$player3-color);
     }
     #pick4main {
-        filter: drop-shadow(0 0 5px $player4-color);
+        filter: drop-shadow(0 0 5px colors.$player4-color);
     }
     #pick5main {
-        filter: drop-shadow(0 0 5px $player5-color);
+        filter: drop-shadow(0 0 5px colors.$player5-color);
     }
     #pick6main {
-        filter: drop-shadow(0 0 5px $player6-color);
+        filter: drop-shadow(0 0 5px colors.$player6-color);
     }
     #pick7main {
-        filter: drop-shadow(0 0 5px $player7-color);
+        filter: drop-shadow(0 0 5px colors.$player7-color);
     }
     #pick8main {
-        filter: drop-shadow(0 0 5px $player8-color);
+        filter: drop-shadow(0 0 5px colors.$player8-color);
     }
     #pick9main {
-        filter: drop-shadow(0 0 5px $player9-color);
+        filter: drop-shadow(0 0 5px colors.$player9-color);
     }
 */
 
@@ -102,45 +72,76 @@ body {
     margin: 5px 0;
     text-align: center;
 }
-
-.player0__border {
-    background: linear-gradient(79deg, $background-dark,$player0-color, $player0-color, $background-dark);
+.center_column {
+    grid-column: 6;
 }
-.player1__border {
-    background: linear-gradient(79deg, $background-dark,$player1-color, $player1-color, $background-dark);
+.player0 {
+    grid-column: 1;
+    &__border {
+        background: linear-gradient(79deg, colors.$background-dark,colors.$player0-color, colors.$player0-color, colors.$background-dark);
+    }
 }
-.player2__border {
-    background: linear-gradient(79deg, $background-dark,$player2-color, $player2-color, $background-dark);
+.player1 {
+    grid-column: 2;
+    &__border {
+        background: linear-gradient(79deg, colors.$background-dark,colors.$player1-color, colors.$player1-color, colors.$background-dark);
+    }
 }
-.player3__border {
-    background: linear-gradient(79deg, $background-dark,$player3-color, $player3-color, $background-dark);
+.player2 {
+    grid-column: 3;
+    &__border {
+        background: linear-gradient(79deg, colors.$background-dark,colors.$player2-color, colors.$player2-color, colors.$background-dark);
+    }
 }
-.player4__border {
-    background: linear-gradient(79deg, $background-dark,$player4-color, $player4-color, $background-dark);
+.player3 {
+    grid-column: 4;
+    &__border {
+        background: linear-gradient(79deg, colors.$background-dark,colors.$player3-color, colors.$player3-color, colors.$background-dark);
+    }
 }
-.player5__border {
-    background: linear-gradient(101deg, $background-dark,$player5-color, $player5-color, $background-dark);
+.player4 {
+    grid-column: 5;
+    &__border {
+        background: linear-gradient(79deg, colors.$background-dark,colors.$player4-color, colors.$player4-color, colors.$background-dark);
+    }
 }
-.player6__border {
-    background: linear-gradient(101deg, $background-dark,$player6-color, $player6-color, $background-dark);
+.player5 {
+    grid-column: 7;
+    &__border {
+        background: linear-gradient(101deg, colors.$background-dark,colors.$player5-color, colors.$player5-color, colors.$background-dark);
+    }
 }
-.player7__border {
-    background: linear-gradient(101deg, $background-dark,$player7-color, $player7-color, $background-dark);
+.player6 {
+    grid-column: 8;
+    &__border {
+        background: linear-gradient(101deg, colors.$background-dark,colors.$player6-color, colors.$player6-color, colors.$background-dark);
+    }
 }
-.player8__border {
-    background: linear-gradient(101deg, $background-dark,$player8-color, $player8-color, $background-dark);
+.player7 {
+    grid-column: 9;
+    &__border {
+        background: linear-gradient(101deg, colors.$background-dark,colors.$player7-color, colors.$player7-color, colors.$background-dark);
+    }
 }
-.player9__border {
-    background: linear-gradient(101deg, $background-dark,$player9-color, $player9-color, $background-dark);
+.player8 {
+    grid-column: 10;
+    &__border {
+        background: linear-gradient(101deg, colors.$background-dark,colors.$player8-color, colors.$player8-color, colors.$background-dark);
+    }
 }
-
+.player9 {
+    grid-column: 11;
+    &__border {
+        background: linear-gradient(101deg, colors.$background-dark,colors.$player9-color, colors.$player9-color, colors.$background-dark);
+    }
+}
 .pick {
     /* 'display: none' until picking functionality can be added. */
     display: none;
     aspect-ratio: 16/9;
     background-repeat: no-repeat;
     background-size: cover;
-    background-image: linear-gradient($background-dark,$background-light); /* make light even lighter? #777 */
+    background-image: linear-gradient(colors.$background-dark,colors.$background-light); /* make light even lighter? #777 */
     position: relative;
 }
 .player_rank {
@@ -177,7 +178,6 @@ body {
         position: relative;
     } 
 */
-
 #options {
     padding: 0 1em 1em 1em;
 }
@@ -187,15 +187,6 @@ body {
     grid-gap: 0.5em;
     grid-auto-flow: column;
 }
-.options_column {
-    width: 20%;
-    position: static;
-    display: grid;
-    grid-row-gap: 5px;
-    padding: 5px;
-    box-sizing: border-box;
-}
-
 .heroCard {
     background-size: cover;
     text-align: center;
@@ -207,38 +198,4 @@ body {
     border-radius: 0.5em;
     width: 100%;
     aspect-ratio: 16/9;
-}
-
-.grid_column0 {
-    grid-column: 1;
-}
-.grid_column1 {
-    grid-column: 2;
-}
-.grid_column2 {
-    grid-column: 3;
-}
-.grid_column3 {
-    grid-column: 4;
-}
-.grid_column4 {
-    grid-column: 5;
-}
-.center_column {
-    grid-column: 6;
-}
-.grid_column5 {
-    grid-column: 7;
-}
-.grid_column6 {
-    grid-column: 8;
-}
-.grid_column7 {
-    grid-column: 9;
-}
-.grid_column8 {
-    grid-column: 10;
-}
-.grid_column9 {
-    grid-column: 11;
 }

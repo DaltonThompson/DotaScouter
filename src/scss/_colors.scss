@@ -1,0 +1,24 @@
+$background-dark: hsl(0, 0%, 13%);
+$background-light: hsl(0, 0%, 27%);
+/* Original Dota2 Colors */
+/*$player0-color: rgb(48, 116, 249);
+$player1-color: rgb(102, 255, 192);
+$player2-color: rgb(189, 0, 183);
+$player3-color: rgb(248, 245, 10);
+$player4-color: rgb(255, 105, 1);
+$player5-color: rgb(255, 136, 197);
+$player6-color: rgb(162, 179, 73);
+$player7-color: rgb(99, 218, 250);
+$player8-color: rgb(1, 131, 31);
+$player9-color: rgb(159, 107, 0); */
+/* Adjusted colors for visibility, to 100% saturation & 35% lightness */
+$player0-color: hsl(220deg, 100%, 35%);
+$player1-color: hsl(155deg, 100%, 35%);
+$player2-color: hsl(302deg, 100%, 35%);
+$player3-color: hsl(59deg, 100%, 35%);
+$player4-color: hsl(25deg, 100%, 35%);
+$player5-color: hsl(329deg, 100%, 35%);
+$player6-color: hsl(70deg, 100%, 35%);
+$player7-color: hsl(193deg, 100%, 35%);
+$player8-color: hsl(134deg, 100%, 35%);
+$player9-color: hsl(40deg, 100%, 35%);
