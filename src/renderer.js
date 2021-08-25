@@ -103,7 +103,6 @@ const requestHeroStats = async () => {
     try {
         const response = await fetch(`https://api.opendota.com/api/heroStats`)
         globalData.heroStats = await response.json()
-        console.log(globalData.heroStats);
     } catch (error) {
         console.log(error.response);
     }
@@ -137,7 +136,6 @@ const requestPlayerData = async(i) => {
         const response = await fetch(`https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersionMin}&gameVersionId=${gameVersionMax}`)
         globalData.player[i].performance = await response.json();
         globalData.player[i].access = true;
-        console.log(globalData.player[i].performance);
     } catch (error) {
         globalData.player[i].access = false;
         console.log(error);
@@ -155,7 +153,6 @@ const requestPlayerPersonal = async(i) => {
         const response = await fetch(`https://api.stratz.com/api/v1/Player/${steamIds[i]}`)
         globalData.player[i].stratzAccess = true;
         globalData.player[i].personal = await response.json();
-        console.log(globalData.player[i].personal);
     } catch (error) {
         globalData.player[i].stratzAccess = false;
         console.log(error.response);
