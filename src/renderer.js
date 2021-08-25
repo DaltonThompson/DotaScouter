@@ -117,7 +117,7 @@ function initializeHeroCards(){
             heroCard.className = `heroCard player${j}`;
             optionsContainer.appendChild(heroCard);
             heroCard.classList.add(`hero` + globalData.heroStats[i].id);
-            heroCard.setAttribute('id', `player${j}__hero` + globalData.heroStats[i].id);
+            heroCard.setAttribute('id', `player${j}__hero${globalData.heroStats[i].id}`);
         }
     }
 }
@@ -163,38 +163,37 @@ const requestPlayerPersonal = async(i) => {
 }
 
 const createPlayerCards = (i) => {
-    let playeri = document.getElementById(`player${i}`);
     if (globalData.player[i].stratzAccess) {
-        if (globalData.player[i].personal.hasOwnProperty('steamAccount')) {
-            document.querySelector(`#player${i} .player_name`).innerText = globalData.player[i].personal.steamAccount.name;
-        } else {
-            console.log(i + ' could not receive avatar or persona name')
-        }
+        
+        globalData.player[i].personal.hasOwnProperty('steamAccount')
+            ? document.querySelector(`.player${i} .player_name`).innerText = globalData.player[i].personal.steamAccount.name
+            : console.log(i + ' could not receive avatar or persona name');
 
+        let playeri = document.querySelector(`.player${i} .player_rank`);
         if (globalData.player[i].personal.steamAccount.seasonRank !== undefined) {
             let tier = globalData.player[i].personal.steamAccount.seasonRank;
             let star = Math.floor((tier / 1) % 10), medal = Math.round(tier / 10);
             if (medal === 1) {
-                document.querySelector(`#player${i} .player_rank`).innerText = `Herald ${star}`;
+                playeri.innerText = `Herald ${star}`;
             } else if (medal === 2) {
-                document.querySelector(`#player${i} .player_rank`).innerText = `Guardian ${star}`;
+                playeri.innerText = `Guardian ${star}`;
             } else if (medal === 3) {
-                document.querySelector(`#player${i} .player_rank`).innerText = `Crusader ${star}`;
+                playeri.innerText = `Crusader ${star}`;
             } else if (medal === 4) {
-                document.querySelector(`#player${i} .player_rank`).innerText = `Archon ${star}`;
+                playeri.innerText = `Archon ${star}`;
             } else if (medal === 5) {
-                document.querySelector(`#player${i} .player_rank`).innerText = `Legend ${star}`;
+                playeri.innerText = `Legend ${star}`;
             } else if (medal === 6) {
-                document.querySelector(`#player${i} .player_rank`).innerText = `Ancient ${star}`;
+                playeri.innerText = `Ancient ${star}`;
             } else if (medal === 7) {
-                document.querySelector(`#player${i} .player_rank`).innerText = `Divine ${star}`;
+                playeri.innerText = `Divine ${star}`;
             } else if (medal === 8) {
-                document.querySelector(`#player${i} .player_rank`).innerText = `Immortal ${star}`;
+                playeri.innerText = `Immortal ${star}`;
             } else {
-                document.querySelector(`#player${i} .player_rank`).innerText = `UNKNOWN`;
+                playeri.innerText = `UNKNOWN`;
             }
         } else {
-            document.querySelector(`#player${i} .player_rank`).innerText = `UNKNOWN`;
+            playeri.innerText = `UNKNOWN`;
         }
     }
 }

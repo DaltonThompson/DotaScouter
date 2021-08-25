@@ -690,11 +690,8 @@ body {
         position: relative;
     } 
 */
-#options {
-  padding: 0 1em 1em 1em;
-}
-
 .options_grid {
+  padding: 0 1em 1em 1em;
   display: grid;
   grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
   grid-gap: 0.5em;
