@@ -503,6 +503,7 @@ $player9-color: rgb(159, 107, 0); */
 }
 * {
   font-family: "Radiance", "Open Sans", sans-serif;
+  margin: 0;
 }
 
 body {
@@ -510,7 +511,6 @@ body {
   background-repeat: no-repeat;
   background-size: cover;
   /* Just for easy math, width is set */
-  margin: 0;
 }
 
 .frame-drag {
@@ -696,6 +696,17 @@ body {
   grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
   grid-gap: 0.5em;
   grid-auto-flow: column;
+}
+
+.noHeroData {
+  display: none;
+  width: 100%;
+  aspect-ratio: 16/9;
+  text-shadow: 0px 0px 10px black;
+  color: white;
+  text-align: center;
+  align-items: center;
+  order: -9999;
 }
 
 .heroCard {

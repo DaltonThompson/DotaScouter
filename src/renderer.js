@@ -169,13 +169,14 @@ function addPlayerProb(hero,idOfHero){
     hero.playerWeights = [];
     // Collect References to available hero data for players
     for (let i = 0; i < playersTotalInGame; i++) {
-        if (globalData.player[i].access) {
-            getWinAttempt(hero, i, globalData.player[i].performance.find(playerAsHero => playerAsHero.heroId === idOfHero));
-        } else {
+        if (!globalData.player[i].access || globalData.player[i].performance.length === 0) {
             let obj = {};
             obj[`weightedScore`] = hero.winRate;
             obj[`activity`] = 0;
             hero.playerWeights[i] = obj;
+            document.getElementById(`player${i}__noHeroData`).style.display = 'flex';
+        } else {
+            getWinAttempt(hero, i, globalData.player[i].performance.find(playerAsHero => playerAsHero.heroId === idOfHero));
         }
         // activity added, with points removed spread out equally among heroes.
         let orderOfCards = Math.round(hero.playerWeights[i].weightedScore*-1000 - hero.playerWeights[i].activity*1000 + 1000/121);
@@ -227,7 +228,7 @@ const createPlayerCards = (i) => {
             } else if (medal === 7) {
                 playeri.innerText = `Divine ${star}`;
             } else if (medal === 8) {
-                playeri.innerText = `Immortal ${star}`;
+                playeri.innerText = `Immortal${globalData.player[i].personal.steamAccount.seasonLeaderboardRank ? ' #'+ globalData.player[i].personal.steamAccount.seasonLeaderboardRank : ''}`;
             } else {
                 playeri.innerText = `UNKNOWN`;
             }
