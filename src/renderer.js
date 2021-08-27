@@ -174,9 +174,12 @@ function addPlayerProb(hero,idOfHero){
         } else {
             let obj = {};
             obj[`weightedScore`] = hero.winRate;
+            obj[`activity`] = 0;
             hero.playerWeights[i] = obj;
         }
-        document.getElementById(`player${i}__hero${idOfHero}`).style.order = Math.round(hero.playerWeights[i].weightedScore*-1000);
+        // activity added, with points removed spread out equally among heroes.
+        let orderOfCards = Math.round(hero.playerWeights[i].weightedScore*-1000 - hero.playerWeights[i].activity*1000 + 1000/121);
+        document.getElementById(`player${i}__hero${idOfHero}`).style.order = orderOfCards;
     }
 };
 
@@ -185,12 +188,13 @@ function getWinAttempt(hero,i,playerAsHero) {
     let obj = {};
     // Takes elem as arg. If no data, returns false; else returns info found at index.
     if (playerAsHero === undefined) {
-        // Removes an arbitrary percent for a hero where the player has no games, because less experience means less ability to perform. Lower winrate heroes are less effected by this. Removes 2.5% from a 50% hero.
-        obj[`weightedScore`] = hero.winRate * 0.95;
+        obj[`weightedScore`] = hero.winRate;
+        obj[`activity`] = 0;
         hero.playerWeights[i] = obj;
     } else {
         let convertedIMP = (playerAsHero.imp + 50)/100;
         obj[`winRate`] = playerAsHero.winCount / playerAsHero.matchCount;
+        obj[`activity`] = playerAsHero.activity;
         // Need 4 games on a hero to be at equal weight with meta.
         obj[`weightedScore`] = ( ( playerAsHero.matchCount * convertedIMP ) + playerAsHero.winCount + (8 * hero.winRate)) / ( (2 * playerAsHero.matchCount) + 8);
         hero.playerWeights[i] = obj;
@@ -205,7 +209,7 @@ const createPlayerCards = (i) => {
             : console.log(i + ' could not receive avatar or persona name');
 
         let playeri = document.querySelector(`.player${i} .player_rank`);
-        if (globalData.player[i].personal.steamAccount.seasonRank !== undefined) {
+        if (globalData.player[i].personal.steamAccount !== undefined && globalData.player[i].personal.steamAccount.seasonRank !== undefined) {
             let tier = globalData.player[i].personal.steamAccount.seasonRank;
             let star = Math.floor((tier / 1) % 10), medal = Math.round(tier / 10);
             if (medal === 1) {
