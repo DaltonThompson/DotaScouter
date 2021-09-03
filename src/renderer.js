@@ -200,55 +200,49 @@ function getWinAttempt(hero,i,playerAsHero) {
 }
 
 const createPlayerCards = (i) => {
-    if (globalData.player[i].stratzAccess) {
+    if (globalData.player[i].stratzAccess) document.querySelector(`.player${i} .player_name`).innerText = globalData.player[i].personal.steamAccount?.name;
+    let playeri = document.querySelector(`.player${i} .player_rank`);
+    if (globalData.player[i].personal?.steamAccount?.seasonRank) {
+        let tier = globalData.player[i].personal.steamAccount.seasonRank;
+        let star = Math.floor((tier / 1) % 10), medal = Math.round(tier / 10);
+
+        switch (medal){
+            case 1:
+                playeri.innerText = `Herald ${star}`;
+                break;
         
-        globalData.player[i].personal.hasOwnProperty('steamAccount')
-            ? document.querySelector(`.player${i} .player_name`).innerText = globalData.player[i].personal.steamAccount.name
-            : console.log(i + ' could not receive avatar or persona name');
+            case 2:
+                playeri.innerText = `Guardian ${star}`;
+                break;
+        
+            case 3:
+                playeri.innerText = `Crusader ${star}`;
+                break;
+        
+            case 4:
+                playeri.innerText = `Archon ${star}`;
+                break;
 
-        let playeri = document.querySelector(`.player${i} .player_rank`);
-        if (globalData.player[i].personal.steamAccount?.seasonRank) {
-            let tier = globalData.player[i].personal.steamAccount.seasonRank;
-            let star = Math.floor((tier / 1) % 10), medal = Math.round(tier / 10);
+            case 5:
+                playeri.innerText = `Legend ${star}`;
+                break;
 
-            switch (medal){
-                case 1:
-                    playeri.innerText = `Herald ${star}`;
-                    break;
-            
-                case 2:
-                    playeri.innerText = `Guardian ${star}`;
-                    break;
-            
-                case 3:
-                    playeri.innerText = `Crusader ${star}`;
-                    break;
-            
-                case 4:
-                    playeri.innerText = `Archon ${star}`;
-                    break;
+            case 6:
+                playeri.innerText = `Ancient ${star}`;
+                break;
 
-                case 5:
-                    playeri.innerText = `Legend ${star}`;
-                    break;
+            case 7:
+                playeri.innerText = `Divine ${star}`;
+                break;
 
-                case 6:
-                    playeri.innerText = `Ancient ${star}`;
-                    break;
-
-                case 7:
-                    playeri.innerText = `Divine ${star}`;
-                    break;
-
-                case 8:
-                    playeri.innerText = `Immortal${globalData.player[i].personal.steamAccount.seasonLeaderboardRank ? ' #'+ globalData.player[i].personal.steamAccount.seasonLeaderboardRank : ''}`;
-                    break;
-            
-                default:
-                    playeri.innerText = `UNKNOWN`;
-            }
-        } else {
-            playeri.innerText = `UNKNOWN`;
+            case 8:
+                playeri.innerText = `Immortal${globalData.player[i].personal.steamAccount.seasonLeaderboardRank ? ' #'+ globalData.player[i].personal.steamAccount.seasonLeaderboardRank : ''}`;
+                break;
+        
+            default:
+                playeri.innerText = `UNKNOWN`;
         }
+    } else {
+        playeri.innerText = `UNKNOWN`;
     }
 }
