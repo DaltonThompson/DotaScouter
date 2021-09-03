@@ -1,7 +1,7 @@
 let testMode;
 let testLog = 'test_log.txt';
-let gameVersionMin = 144;
-let gameVersionMax = 145;
+let gameVersionMin = 145;
+let gameVersionMax = 146;
 
 // dependencies
 const chokidar = require('chokidar'), fs = require('fs'), path = require('path'), os = require('os'), fetch = require('node-fetch');
@@ -100,37 +100,45 @@ function parseLog(lastLine, penultLine, secondLastLine) {
 };
 
 const promiseChain = async () => {
-    await requestHeroStats();
-    await Promise.all([iterateThroughPlayers(requestPlayerData),initializeHeroCards()]);
+
+    // Get heroStats
+    await fetchAndSave(`https://api.opendota.com/api/heroStats`, globalData, `heroStats`);
+
+    // Simultaneously get heroPerformance for each player and create hero cards.
+    await Promise.all([
+        iterateThroughPlayers((i) => fetchAndSave(`https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersionMin}&gameVersionId=${gameVersionMax}`, globalData, `player`, i, `performance`, `access`)),
+        initializeHeroCards()
+    ]);
+
     orderCards();
-    await iterateThroughPlayers(requestPlayerPersonal);
+
+    // Simultaneously get personal data (e.g. username) and create player cards.
+    await iterateThroughPlayers((i) => fetchAndSave(`https://api.stratz.com/api/v1/Player/${steamIds[i]}`, globalData, `player`, i, `personal`, `stratzAccess`)),
     iterateThroughPlayers(createPlayerCards);
 };
 
-const requestHeroStats = async () => {
+// (string, object, string, etc.)
+const fetchAndSave = async(targetUri, saveLocationParent, child, iteration, property, accessNote) => {
+    console.log(targetUri);
     try {
-        const response = await fetch(`https://api.opendota.com/api/heroStats`)
-        globalData.heroStats = await response.json()
+        const response = await fetch(targetUri);
+        if (property) {
+            saveLocationParent[child][iteration][property] = await response.json();
+            saveLocationParent[child][iteration][accessNote] = true;
+        } else {
+            saveLocationParent[child] = await response.json();
+        }
+        // if (accessNoteLocation) saveLocationParent[accessNoteLocation] = true;
     } catch (error) {
         console.log(error.response);
+        saveLocationParent[child][iteration][accessNote] = false;
     }
-};
+}
 
 const iterateThroughPlayers = async(callback) => {
     let promiseArray = [];
     for (let i = 0; i < playersTotalInGame; i++) promiseArray.push(callback(i));
     return Promise.all(promiseArray);
-};
-
-const requestPlayerData = async(i) => {
-    try {
-        const response = await fetch(`https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersionMin}&gameVersionId=${gameVersionMax}`)
-        globalData.player[i].performance = await response.json();
-        globalData.player[i].access = true;
-    } catch (error) {
-        globalData.player[i].access = false;
-        console.log(error);
-    }
 };
 
 function initializeHeroCards(){
@@ -143,17 +151,6 @@ function initializeHeroCards(){
             heroCard.classList.add(`hero` + globalData.heroStats[i].id);
             heroCard.setAttribute('id', `player${j}__hero${globalData.heroStats[i].id}`);
         }
-    }
-}
-
-const requestPlayerPersonal = async(i) => {
-    try {
-        const response = await fetch(`https://api.stratz.com/api/v1/Player/${steamIds[i]}`)
-        globalData.player[i].stratzAccess = true;
-        globalData.player[i].personal = await response.json();
-    } catch (error) {
-        globalData.player[i].stratzAccess = false;
-        console.log(error.response);
     }
 }
 
