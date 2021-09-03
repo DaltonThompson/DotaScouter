@@ -207,27 +207,45 @@ const createPlayerCards = (i) => {
             : console.log(i + ' could not receive avatar or persona name');
 
         let playeri = document.querySelector(`.player${i} .player_rank`);
-        if (globalData.player[i].personal.steamAccount !== undefined && globalData.player[i].personal.steamAccount.seasonRank !== undefined) {
+        if (globalData.player[i].personal.steamAccount?.seasonRank) {
             let tier = globalData.player[i].personal.steamAccount.seasonRank;
             let star = Math.floor((tier / 1) % 10), medal = Math.round(tier / 10);
-            if (medal === 1) {
-                playeri.innerText = `Herald ${star}`;
-            } else if (medal === 2) {
-                playeri.innerText = `Guardian ${star}`;
-            } else if (medal === 3) {
-                playeri.innerText = `Crusader ${star}`;
-            } else if (medal === 4) {
-                playeri.innerText = `Archon ${star}`;
-            } else if (medal === 5) {
-                playeri.innerText = `Legend ${star}`;
-            } else if (medal === 6) {
-                playeri.innerText = `Ancient ${star}`;
-            } else if (medal === 7) {
-                playeri.innerText = `Divine ${star}`;
-            } else if (medal === 8) {
-                playeri.innerText = `Immortal${globalData.player[i].personal.steamAccount.seasonLeaderboardRank ? ' #'+ globalData.player[i].personal.steamAccount.seasonLeaderboardRank : ''}`;
-            } else {
-                playeri.innerText = `UNKNOWN`;
+
+            switch (medal){
+                case 1:
+                    playeri.innerText = `Herald ${star}`;
+                    break;
+            
+                case 2:
+                    playeri.innerText = `Guardian ${star}`;
+                    break;
+            
+                case 3:
+                    playeri.innerText = `Crusader ${star}`;
+                    break;
+            
+                case 4:
+                    playeri.innerText = `Archon ${star}`;
+                    break;
+
+                case 5:
+                    playeri.innerText = `Legend ${star}`;
+                    break;
+
+                case 6:
+                    playeri.innerText = `Ancient ${star}`;
+                    break;
+
+                case 7:
+                    playeri.innerText = `Divine ${star}`;
+                    break;
+
+                case 8:
+                    playeri.innerText = `Immortal${globalData.player[i].personal.steamAccount.seasonLeaderboardRank ? ' #'+ globalData.player[i].personal.steamAccount.seasonLeaderboardRank : ''}`;
+                    break;
+            
+                default:
+                    playeri.innerText = `UNKNOWN`;
             }
         } else {
             playeri.innerText = `UNKNOWN`;
