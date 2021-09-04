@@ -1,7 +1,6 @@
 let testMode;
 let testLog = 'test_log.txt';
-let gameVersionMin = 145;
-let gameVersionMax = 146;
+let gameVersions = 2;
 
 // dependencies
 const chokidar = require('chokidar'), fs = require('fs'), path = require('path'), os = require('os'), fetch = require('node-fetch');
@@ -13,7 +12,25 @@ let server_log = os.homedir + "/Library/Application Support/Steam/SteamApps/comm
 const optionsContainer = document.querySelector('.options_grid');
 
 // Creates object to hold all hero and player data.
-let globalData = {};
+let globalData = {
+    'gameVersion':[
+        {
+          "id": 146,
+          "name": "7.30b",
+          "startDate": "2021-08-23T00:00:00"
+        },
+        {
+          "id": 145,
+          "name": "7.30",
+          "startDate": "2021-08-18T00:00:00"
+        },
+        {
+          "id": 144,
+          "name": "7.29d",
+          "startDate": "2021-05-24T00:00:00"
+        }
+    ]
+};
 
 // Declares number of players to evaluate. Only change if testing.
 let playersTotalInGame = 10;
@@ -101,12 +118,15 @@ function parseLog(lastLine, penultLine, secondLastLine) {
 
 const promiseChain = async () => {
 
-    // Get heroStats
-    await fetchAndSave(`https://api.opendota.com/api/heroStats`, globalData, `heroStats`);
+    // Get heroStats & gameVersion simulateously
+    await Promise.all([
+        fetchAndSave(`https://api.opendota.com/api/heroStats`, globalData, `heroStats`),
+        fetchAndSave(`https://api.stratz.com/api/v1/GameVersion`, globalData, `gameVersion`)
+    ]);
 
     // Simultaneously get heroPerformance for each player and create hero cards.
     await Promise.all([
-        iterateThroughPlayers((i) => fetchAndSave(`https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersionMin}&gameVersionId=${gameVersionMax}`, globalData, `player`, i, `performance`, `access`)),
+        iterateThroughPlayers((i) => fetchAndSave(`https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${globalData.gameVersion[gameVersions-1].id}&gameVersionId=${globalData.gameVersion[0].id}`, globalData, `player`, i, `performance`, `access`)),
         initializeHeroCards()
     ]);
 
@@ -178,23 +198,43 @@ function addPlayerProb(hero,idOfHero){
         // activity added, with points removed spread out equally among heroes.
         let orderOfCards = Math.round(hero.playerWeights[i].weightedScore*-1000 - hero.playerWeights[i].activity*1000 + 1000/121);
         document.getElementById(`player${i}__hero${idOfHero}`).style.order = orderOfCards;
+        if (hero.playerWeights[i].activity === 0) document.getElementById(`player${i}__hero${idOfHero}`).style.display = 'none';
     }
 };
 
+// ORIGINAL, ACCOUNTING FOR META
+// function getWinAttempt(hero,i,playerAsHero) {
+//     // Array to save information
+//     let obj = {};
+//     // Takes elem as arg. If no data, returns false; else returns info found at index.
+//     if (playerAsHero === undefined) {
+//         obj[`weightedScore`] = hero.winRate;
+//         obj[`activity`] = 0;
+//         hero.playerWeights[i] = obj;
+//     } else {
+//         let convertedIMP = (playerAsHero.imp + 50)/100;
+//         obj[`winRate`] = playerAsHero.winCount / playerAsHero.matchCount;
+//         obj[`activity`] = playerAsHero.activity;
+//         // Need 4 games on a hero to be at equal weight with meta.
+//         obj[`weightedScore`] = ( ( playerAsHero.matchCount * convertedIMP ) + playerAsHero.winCount + (8 * hero.winRate)) / ( (2 * playerAsHero.matchCount) + 8);
+//         hero.playerWeights[i] = obj;
+//     }
+// }
+
+// NEW, IGNORING META FOR PLAYERS WITH DATA
 function getWinAttempt(hero,i,playerAsHero) {
     // Array to save information
     let obj = {};
     // Takes elem as arg. If no data, returns false; else returns info found at index.
     if (playerAsHero === undefined) {
-        obj[`weightedScore`] = hero.winRate;
+        obj[`weightedScore`] = 0;
         obj[`activity`] = 0;
         hero.playerWeights[i] = obj;
     } else {
         let convertedIMP = (playerAsHero.imp + 50)/100;
         obj[`winRate`] = playerAsHero.winCount / playerAsHero.matchCount;
         obj[`activity`] = playerAsHero.activity;
-        // Need 4 games on a hero to be at equal weight with meta.
-        obj[`weightedScore`] = ( ( playerAsHero.matchCount * convertedIMP ) + playerAsHero.winCount + (8 * hero.winRate)) / ( (2 * playerAsHero.matchCount) + 8);
+        obj[`weightedScore`] = ( ( playerAsHero.matchCount * convertedIMP ) + playerAsHero.winCount ) / ( 2 * playerAsHero.matchCount );
         hero.playerWeights[i] = obj;
     }
 }
