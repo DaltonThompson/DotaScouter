@@ -17,16 +17,16 @@ body {
     background-size: cover;
     /* Just for easy math, width is set */
 }
-.frame-drag {
-    position: absolute;
-    height: 22px;
-    top: 0;
-    width: 100%;
-}
+// .frame-drag {
+//     position: absolute;
+//     height: 22px;
+//     top: 0;
+//     width: 100%;
+// }
 #players {
     position: sticky;
     top: 0;
-    padding: 22px 1em 1em 1em;
+    padding: 1em;
     background-color: colors.$background-dark;
     display: grid;
     grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
