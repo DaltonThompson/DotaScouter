@@ -1,5 +1,3 @@
-let testMode;
-let testLog = 'test_log.txt';
 let gameVersions = 2;
 
 // dependencies
@@ -36,26 +34,18 @@ let globalData = {
 let playersTotalInGame = 10;
 let targetPath = server_log;
 
-function enterTestMode() {
-    testMode = true;
-    playersTotalInGame = 1;
-    watcher.unwatch(targetPath);
-    targetPath = testLog;
-    watcher;
-    readLog();
+// Checks dev-mode.json -- if true, copy playersInGame and targetPath values.
+let devMode;
+try {
+    devMode = require('./dev-mode.json')
+} catch {
+    console.log('%cDid not detect %c./dev-mode.json', 'color:#ddd','font-style:italics')
 }
-
-function exitTestMode() {
-    testMode = false;
-    playersTotalInGame = 10;
-    watcher.unwatch(targetPath);
-    targetPath = server_log;
-    watcher;
-    readLog();
+if (devMode.devMode) {
+    console.log('%cEntering developer mode.', 'color:#ff0')
+    targetPath = devMode.testLog,
+    playersTotalInGame = devMode.playersInGame
 }
-// testMode = true;
-// playersTotalInGame = 1;
-// targetPath = testLog;
 
 // Observes log for all events
 const watcher = chokidar.watch(targetPath).on('all', (event, path) => {
