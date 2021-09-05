@@ -15,9 +15,9 @@ const swHelper = {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').then(registration => {
                 swHelper.SW = registration.installing || registration.waiting || registration.active;
-                console.log('Promise resolved: SW registered!')
+                console.log('%cSW: %cregistration promise resolved', 'color:#0dd', 'color:#eee')
             })
-            if (navigator.serviceWorker.controller) console.log('we got a SW babe')
+            if (navigator.serviceWorker.controller) console.log('%cSW: %cexists', 'color:#0ff', 'color:#eee')
         } else {
             console.log('Service workers unsupported?! In Electron?!')
         }
@@ -88,19 +88,19 @@ function parseLog(lastLine, penultLine, secondLastLine) {
     if (secondLastLine) secondLastLineMatch = secondLastLine.match(regex);
 
     if (lastLineMatch) {
-        console.log('Ongoing game is being processed.');
+        console.log('%cParsing: %clast line is being processed.', 'color:#dd0', 'color:#eee');
         match = lastLineMatch;
     } else if (penultLineMatch) {
-        console.log('Previous game is being processed.');
+        console.log('%cParsing: %cfirst previous line is being processed.', 'color:#dd0', 'color:#eee');
         match = penultLineMatch;
     } else if (secondLastLineMatch) {
-        console.log('Previous game is being processed.');
+        console.log('%cParsing: %csecond previous line is being processed.', 'color:#dd0', 'color:#eee');
         match = secondLastLineMatch;
     } else {
-        return console.log('No match found in last line of file.');
+        return console.log('%cParsing: %cno match found in last line of file.', 'color:#dd0', 'color:#f33; font-style:italic');
     }
 
-    console.log(`Match: ${match}`);
+    console.log(match);
 
     // I believe that dateRegex and dateSplit are the same thing?
     let date = match[1], dateRegex = /\//, time = match[2], dateSplit = date.split("/"), timeSplit = time.split(":"), matchDatetime = new Date(dateSplit[2], dateSplit[0] - 1, dateSplit[1], timeSplit[0], timeSplit[1], timeSplit[2]), server = match[3], lobbyId = match[4], gameMode = match[5], playersString = match[6], playersRegex = /\d:(\[U:\d:\d+])/g, playersMatch;
@@ -146,7 +146,7 @@ const promiseChain = async () => {
 
 // (string, object, string, etc.)
 const fetchAndSave = async(targetUri, saveLocationParent, child, iteration, property, accessNote) => {
-    console.log(targetUri);
+    console.log(`%cFetching: %c${targetUri}`, 'color:#f4f', 'color:#eee');
     try {
         const response = await fetch(targetUri);
         if (property) {
@@ -182,7 +182,7 @@ function initializeHeroCards(){
 }
 
 function orderCards() {
-    console.log('Starting orderCards')
+    console.log('%cStarting orderCards', 'color:#dd0')
     // Callback for each globalData.heroStats.id
     globalData.heroStats.forEach(hero => addPlayerProb(hero,hero.id));
 }
