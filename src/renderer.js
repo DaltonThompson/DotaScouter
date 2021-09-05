@@ -11,6 +11,23 @@ let server_log = os.homedir + "/Library/Application Support/Steam/SteamApps/comm
 // DOM references
 const optionsContainer = document.querySelector('.options_grid');
 
+const swHelper = {
+    SW: null,
+    init() {
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(registration => {
+                swHelper.SW = registration.installing || registration.waiting || registration.active;
+                console.log('Promise resolved: SW registered!')
+            })
+            if (navigator.serviceWorker.controller) console.log('we got a SW babe')
+        } else {
+            console.log('Service workers unsupported?! In Electron?!')
+        }
+    }
+};
+
+document.addEventListener('DOMContentLoaded', swHelper.init);
+
 // Creates object to hold all hero and player data.
 let globalData = {
     'gameVersion':[
