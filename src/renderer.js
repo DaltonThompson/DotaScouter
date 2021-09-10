@@ -60,17 +60,16 @@ function parseLog(lastLine, penultLine, secondLastLine) {
     if (secondLastLine) secondLastLineMatch = secondLastLine.match(regex);
 
     if (lastLineMatch) {
-        console.log('Ongoing game is being processed.');
+        console.log('%cParsing: %clast line is being processed.', 'color:#dd0', 'color:#eee');
         match = lastLineMatch;
     } else if (penultLineMatch) {
-        console.log('Previous game is being processed.');
+        console.log('%cParsing: %cfirst previous line is being processed.', 'color:#dd0', 'color:#eee');
         match = penultLineMatch;
     } else if (secondLastLineMatch) {
-        console.log('Previous game is being processed.');
+        console.log('%cParsing: %csecond previous line is being processed.', 'color:#dd0', 'color:#eee');
         match = secondLastLineMatch;
     } else {
-        return console.log('No match found in last line of file.');
-    }
+        return console.log('%cParsing: %cno match found in last line of file.', 'color:#dd0', 'color:#f33; font-style:italic');    }
 
     console.log(`Match: ${match}`);
 
@@ -154,7 +153,7 @@ function initializeHeroCards(){
 }
 
 function orderCards() {
-    console.log('Starting orderCards')
+    console.log('%cStarting orderCards', 'color:#dd0')
     // Callback for each globalData.heroStats.id
     for (let i = 0; i < playersTotalInGame; i++) {
         applyOrderToHeroCard(i,steamIds[i]);
