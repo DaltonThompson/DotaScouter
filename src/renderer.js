@@ -1,8 +1,16 @@
 // dependencies
 const chokidar = require('chokidar'), fs = require('fs'), path = require('path'), os = require('os'), fetch = require('node-fetch');
 
-let expiration = 3600000;
-let gameVersions;
+let expiration = 3600000; // Integer in ms. 3600000 ms === 1 hr
+let gameVersions; // Array to be read from cache/localStorage or fetched.
+
+// represent rows of gameVersions array
+let gameVersionEarliest = 1;
+let gameVersionLatest = 0;
+
+let weightIMP = 1; // IMP is 'Individual Match Performance' provided by 
+let weightActivity = 1; // Activity currently refers to a directly calculated percent of all matches in which the hero is played.
+let multiplierForOrdering = -100; // -1000 turns 0.536 into -536, useful for percents where the first decimal matters, and must be negative to display in descending order.
 
 // External paths
 let server_log = os.homedir + "/Library/Application Support/Steam/SteamApps/common/dota 2 beta/game/dota/server_log.txt";
@@ -96,7 +104,7 @@ const promiseChain = async () => {
 
     // Simultaneously get heroPerformance for each player and create hero cards.
     await Promise.all([
-        iterateThroughPlayers((i) => fetchAndSave(`player${steamIds[i]}patch${gameVersions[0].id}`, expiration, `https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersions[0].id}&gameVersionId=${gameVersions[0].id}`)),
+        iterateThroughPlayers((i) => fetchAndSave(`player${steamIds[i]}patch${gameVersions[gameVersionLatest].id}`, expiration, `https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersions[gameVersionLatest].id}`)), // `?gameVersionId=` a comma-delimited array of patch IDs. Currently saving only the most recent (i.e. gameVersions[0]), but may need to add looping if fetching data from other patches.
         initializeHeroCards()
     ]);
 
@@ -149,27 +157,34 @@ function orderCards() {
     console.log('Starting orderCards')
     // Callback for each globalData.heroStats.id
     for (let i = 0; i < playersTotalInGame; i++) {
-        addPlayerProb2(i,steamIds[i]);
+        applyOrderToHeroCard(i,steamIds[i]);
     }
 }
 
-async function addPlayerProb2(i,id){
+async function applyOrderToHeroCard(i,id){
     console.log(i,id);
-    let performanceRef = await JSON.parse(localStorage.getItem(`player${id}patch${gameVersions[0].id}`));
+    let performanceRef = await JSON.parse(localStorage.getItem(`player${id}patch${gameVersions[gameVersionLatest].id}`));
     console.log(performanceRef);
     if (performanceRef.length === 0) return document.getElementById(`player${i}__noHeroData`).style.display = 'flex';
-    let orderOfCards;
+    let totalMatchCount = findTotalMatches(performanceRef);
     performanceRef.forEach(playerAsHero => {
-        let arr = addPlayerProb3(playerAsHero);
-        orderOfCards = Math.round(arr[0]*-1000 - arr[1]*1000 + 1000/121);
+        let { convertedIMP, heroMatchCount } = heroIMPAndMatchCount(playerAsHero);
+        let orderOfCards = Math.round(multiplierForOrdering * ((weightIMP*convertedIMP) + (weightActivity * (heroMatchCount/totalMatchCount)))/(weightIMP+weightActivity));
         document.getElementById(`player${i}__hero${playerAsHero.heroId}`).style.order = orderOfCards;
         document.getElementById(`player${i}__hero${playerAsHero.heroId}`).style.display = 'flex';
     });
 }
 
-function addPlayerProb3(playerAsHero){
-    let convertedIMP = (playerAsHero.imp + 50)/100;
-    return [(((playerAsHero.matchCount*convertedIMP)+playerAsHero.winCount)/(2*playerAsHero.matchCount)),playerAsHero.activity];
+function findTotalMatches(playerPerformanceObj){
+    let totalMatchCount = 0;
+    playerPerformanceObj.forEach(playerAsHero => totalMatchCount += playerAsHero.matchCount);
+    return totalMatchCount;
+}
+
+// Takes each line of heroPerformance, pulls the player's hero IMP score, converts into 0-to-1 scale (compatible with percentages), and returns it.
+function heroIMPAndMatchCount(playerAsHero){
+    let convertedIMP = (playerAsHero.imp + 50)/100; // turns -50 -> 50 scale into 0 -> 1
+    return {'convertedIMP':convertedIMP, 'heroMatchCount':playerAsHero.matchCount}; // activity is already 0 -> 1.
 }
 
 const createPlayerCards = (i) => {
@@ -181,39 +196,39 @@ const createPlayerCards = (i) => {
     }
     let playeri = document.querySelector(`.player${i} .player_rank`);
     if (playerRef.steamAccount?.seasonRank) {
-        let tier = playerRef.steamAccount.seasonRank;
-        let star = Math.floor((tier / 1) % 10), medal = Math.round(tier / 10);
+        let tier = playerRef.steamAccount.seasonRank.toString();
+        let medal = tier.charAt(0), star = tier.charAt(1);
 
         switch (medal){
-            case 1:
+            case '1':
                 playeri.innerText = `Herald ${star}`;
                 break;
         
-            case 2:
+            case '2':
                 playeri.innerText = `Guardian ${star}`;
                 break;
         
-            case 3:
+            case '3':
                 playeri.innerText = `Crusader ${star}`;
                 break;
         
-            case 4:
+            case '4':
                 playeri.innerText = `Archon ${star}`;
                 break;
 
-            case 5:
+            case '5':
                 playeri.innerText = `Legend ${star}`;
                 break;
 
-            case 6:
+            case '6':
                 playeri.innerText = `Ancient ${star}`;
                 break;
 
-            case 7:
-                playeri.innerText = `Divine ${star}`;
+            case '7':
+                playeri.innerText = `Divine ${star}`;i
                 break;
 
-            case 8:
+            case '8':
                 playeri.innerText = `Immortal${playerRef.steamAccount.seasonLeaderboardRank ? ' #'+ globalData.playerRef.steamAccount.seasonLeaderboardRank : ''}`;
                 break;
         
