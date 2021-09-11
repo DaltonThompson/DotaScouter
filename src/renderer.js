@@ -1,6 +1,3 @@
-// dependencies
-const chokidar = require('chokidar'), fs = require('fs'), path = require('path'), os = require('os'), fetch = require('node-fetch');
-
 let expiration = 3600000; // Integer in ms. 3600000 ms === 1 hr
 let gameVersions; // Array to be read from cache/localStorage or fetched.
 
@@ -12,84 +9,29 @@ let weightIMP = 1; // IMP is 'Individual Match Performance' provided by
 let weightActivity = 1; // Activity currently refers to a directly calculated percent of all matches in which the hero is played.
 let multiplierForOrdering = -100; // -1000 turns 0.536 into -536, useful for percents where the first decimal matters, and must be negative to display in descending order.
 
-// External paths
-let server_log = os.homedir + "/Library/Application Support/Steam/SteamApps/common/dota 2 beta/game/dota/server_log.txt";
-
 // DOM references
 const optionsContainer = document.querySelector('.options_grid');
 
 // Declares number of players to evaluate. Only change if testing.
 let playersTotalInGame = 10;
-let targetPath = server_log;
-
-// Checks dev-mode.json -- if true, copy playersInGame and targetPath values.
-let devMode;
-try {
-    devMode = require('./dev-mode.json')
-} catch {
-    console.log('%cDid not detect %c./dev-mode.json', 'color:#ddd','font-style:italics')
-}
-if (devMode.devMode) {
-    console.log('%cEntering developer mode.', 'color:#ff0')
-    targetPath = devMode.testLog,
-    playersTotalInGame = devMode.playersInGame
-}
-
-// Observes log for all events
-const watcher = chokidar.watch(targetPath).on('all', (event, path) => {
-        console.log(event, path, readLog());
-});
-watcher;
-
-// function from dotabuddy. Finds last line of targetPath, calls parselog on it.
-function readLog(){
-    let lines = [];
-    fs.readFileSync(targetPath).toString().split("\n").forEach(line => lines.push(line));
-    return this.parseLog(lines[lines.length - 1], lines[lines.length - 2], lines[lines.length - 3]);
-};
+let targetPath; // = server_log;
 
 let steamIds;
 let currentMatch;
 
-// function from dotabuddy. Parses log into steamIds, additional data includes date, time, game mode.
-function parseLog(lastLine, penultLine, secondLastLine) {
+document.getElementById("buttonEnterIds").addEventListener("click", manuallyEnterIds);
 
-    let regex = /(.*?) - (.*?): (.*?) \(Lobby (\d+) (\w+) (.*?)\)/, match, lastLineMatch = lastLine.match(regex), penultLineMatch, secondLastLineMatch;
-
-    if (penultLine) penultLineMatch = penultLine.match(regex);
-    if (secondLastLine) secondLastLineMatch = secondLastLine.match(regex);
-
-    if (lastLineMatch) {
-        console.log('%cParsing: %clast line is being processed.', 'color:#dd0', 'color:#eee');
-        match = lastLineMatch;
-    } else if (penultLineMatch) {
-        console.log('%cParsing: %cfirst previous line is being processed.', 'color:#dd0', 'color:#eee');
-        match = penultLineMatch;
-    } else if (secondLastLineMatch) {
-        console.log('%cParsing: %csecond previous line is being processed.', 'color:#dd0', 'color:#eee');
-        match = secondLastLineMatch;
+function manuallyEnterIds() {
+    let string = prompt("Please enter up to 10 player IDs, separated by commas:", "399920568,28070572,242885483,173971950,185001854,110448679,126238768,43276219,50828662,84429681");
+    if (string == null || string == "") {
+        text = "User cancelled the prompt.";
     } else {
-        return console.log('%cParsing: %cno match found in last line of file.', 'color:#dd0', 'color:#f33; font-style:italic');    }
-
-    console.log(`Match: ${match}`);
-
-    // I believe that dateRegex and dateSplit are the same thing?
-    let date = match[1], dateRegex = /\//, time = match[2], dateSplit = date.split("/"), timeSplit = time.split(":"), matchDatetime = new Date(dateSplit[2], dateSplit[0] - 1, dateSplit[1], timeSplit[0], timeSplit[1], timeSplit[2]), server = match[3], lobbyId = match[4], gameMode = match[5], playersString = match[6], playersRegex = /\d:(\[U:\d:\d+])/g, playersMatch;
-    steamIds = [];
-    while (playersMatch = playersRegex.exec(playersString)) {
-        let sid = playersMatch[1].substring(5, playersMatch[1].length - 1);
-        steamIds.push(sid);
+        let arr = JSON.parse("[" + string + "]");
+        if (arr.length > 10) return alert('Please limit to 10 Steam IDs.');
+        steamIds = arr;
+        promiseChain();
     }
-
-    // Set values for the match on globalData.
-    currentMatch = {
-        'time': matchDatetime,
-        'mode': gameMode,
-        'server': server
-    };
-
-    return promiseChain();
-};
+}
 
 const promiseChain = async () => {
 
@@ -228,7 +170,7 @@ const createPlayerCards = (i) => {
                 break;
 
             case '8':
-                playeri.innerText = `Immortal${playerRef.steamAccount.seasonLeaderboardRank ? ' #'+ globalData.playerRef.steamAccount.seasonLeaderboardRank : ''}`;
+                playeri.innerText = `Immortal${playerRef.steamAccount.seasonLeaderboardRank ? ' #'+ playerRef.steamAccount.seasonLeaderboardRank : ''}`;
                 break;
         
             default:
