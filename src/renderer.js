@@ -22,23 +22,39 @@ let currentMatch;
 document.getElementById("buttonEnterIds").addEventListener("click", manuallyEnterIds);
 
 function manuallyEnterIds() {
-    let string = prompt("Please enter up to 10 player IDs, separated by commas:", "399920568,28070572,242885483,173971950,185001854,110448679,126238768,43276219,50828662,84429681");
-    if (string == null || string == "") {
-        text = "User cancelled the prompt.";
-    } else {
-        let arr = JSON.parse("[" + string + "]");
-        if (arr.length > 10) return alert('Please limit to 10 Steam IDs.');
-        steamIds = arr;
+    let formIds = document.getElementById("idSubmission");
+    this.removeEventListener("click", manuallyEnterIds);
+    formIds.style = 'display: contents;';
+    this.addEventListener("click", submitIds);
+    function submitIds() {
+        console.log('start submitIds');
+        let idArray = [];
+        for (let i = 0; i < formIds.length; i++) {
+            idArray.push(formIds.elements[i].value);
+        }
+        steamIds = idArray;
+        console.log('end submitIds');
+        formIds.style = 'display: none;';
+        this.removeEventListener("click", submitIds);
+        this.addEventListener("click", manuallyEnterIds);
         promiseChain();
     }
 }
-
+let validPlayers = [];
+function determineValidPlayers() {
+    let arr = [];
+    for (let i = 0; i < steamIds.length; i++) {
+        if (steamIds[i] > 0) arr.push(i);
+    }
+    return validPlayers = arr;
+}
 const promiseChain = async () => {
 
-    // Get heroStats & gameVersion simulateously
+    // Get heroStats & gameVersion, and determine which steamIds are valid simultaneously
     await Promise.all([
         fetchAndSave(`heroStats`, expiration, `https://api.opendota.com/api/heroStats`),
-        fetchAndSave(`gameVersions`, expiration, `https://api.stratz.com/api/v1/GameVersion`)
+        fetchAndSave(`gameVersions`, expiration, `https://api.stratz.com/api/v1/GameVersion`),
+        determineValidPlayers()
     ]);
     gameVersions = JSON.parse(localStorage.gameVersions);
     heroStats = JSON.parse(localStorage.heroStats);
@@ -77,7 +93,7 @@ const fetchThings = async(targetUri, targetItem) => {
 
 const iterateThroughPlayers = async(callback) => {
     let promiseArray = [];
-    for (let i = 0; i < playersTotalInGame; i++) promiseArray.push(callback(i));
+    for (let i = 0; i < validPlayers.length; i++) promiseArray.push(callback(validPlayers[i]));
     return Promise.all(promiseArray);
 };
 
@@ -97,10 +113,9 @@ function initializeHeroCards(){
 
 function orderCards() {
     console.log('%cStarting orderCards', 'color:#dd0')
-    // Callback for each globalData.heroStats.id
-    for (let i = 0; i < playersTotalInGame; i++) {
-        applyOrderToHeroCard(i,steamIds[i]);
-    }
+    validPlayers.forEach(i => {
+        applyOrderToHeroCard(i,steamIds[i])
+    })
 }
 
 async function applyOrderToHeroCard(i,id){

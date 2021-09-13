@@ -33,16 +33,30 @@ body {
     grid-gap: 0.5em;
     grid-auto-flow: column;
 }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+form {
+    display: none;
+}
+input[type=number] {
+    max-width: 11ch;
+    border-radius: 5px;
+    grid-row: 1;
+}
 #buttonEnterIds {
     border: white;
     border-radius: 1em;
     border-style: ridge;
-    border-width: 5px;
+    border-width: 3px;
     padding: 7px;
     color: white;
     font-size: 0.75em;
     margin: auto;
     text-align: center;
+    background-color: colors.$background-dark;
 }
 /* Drop shadow: might add back if colors can move to similar saturation/brightness. 
     #pick0main {
