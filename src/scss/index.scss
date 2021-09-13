@@ -33,6 +33,17 @@ body {
     grid-gap: 0.5em;
     grid-auto-flow: column;
 }
+#buttonEnterIds {
+    border: white;
+    border-radius: 1em;
+    border-style: ridge;
+    border-width: 5px;
+    padding: 7px;
+    color: white;
+    font-size: 0.75em;
+    margin: auto;
+    text-align: center;
+}
 /* Drop shadow: might add back if colors can move to similar saturation/brightness. 
     #pick0main {
         filter: drop-shadow(0 0 5px colors.$player0-color);
@@ -160,6 +171,7 @@ body {
     display: inline-block;
     text-shadow: 0 0 2px;
     vertical-align: bottom;
+    line-height: 1em;
 }
 /* Rank images: Unused for now
     .rankCard {

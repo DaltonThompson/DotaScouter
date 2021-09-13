@@ -1,148 +1,78 @@
-let gameVersions = 2;
+let expiration = 3600000; // Integer in ms. 3600000 ms === 1 hr
+let gameVersions; // Array to be read from cache/localStorage or fetched.
 
-// dependencies
-const chokidar = require('chokidar'), fs = require('fs'), path = require('path'), os = require('os'), fetch = require('node-fetch');
+// represent rows of gameVersions array
+let gameVersionEarliest = 1;
+let gameVersionLatest = 0;
 
-// External paths
-let server_log = os.homedir + "/Library/Application Support/Steam/SteamApps/common/dota 2 beta/game/dota/server_log.txt";
+let weightIMP = 1; // IMP is 'Individual Match Performance' provided by 
+let weightActivity = 1; // Activity currently refers to a directly calculated percent of all matches in which the hero is played.
+let multiplierForOrdering = -100; // -1000 turns 0.536 into -536, useful for percents where the first decimal matters, and must be negative to display in descending order.
 
 // DOM references
 const optionsContainer = document.querySelector('.options_grid');
 
-// Creates object to hold all hero and player data.
-let globalData = {
-    'gameVersion':[
-        {
-          "id": 146,
-          "name": "7.30b",
-          "startDate": "2021-08-23T00:00:00"
-        },
-        {
-          "id": 145,
-          "name": "7.30",
-          "startDate": "2021-08-18T00:00:00"
-        },
-        {
-          "id": 144,
-          "name": "7.29d",
-          "startDate": "2021-05-24T00:00:00"
-        }
-    ]
-};
-
 // Declares number of players to evaluate. Only change if testing.
 let playersTotalInGame = 10;
-let targetPath = server_log;
-
-// Checks dev-mode.json -- if true, copy playersInGame and targetPath values.
-let devMode;
-try {
-    devMode = require('./dev-mode.json')
-} catch {
-    console.log('%cDid not detect %c./dev-mode.json', 'color:#ddd','font-style:italics')
-}
-if (devMode.devMode) {
-    console.log('%cEntering developer mode.', 'color:#ff0')
-    targetPath = devMode.testLog,
-    playersTotalInGame = devMode.playersInGame
-}
-
-// Observes log for all events
-const watcher = chokidar.watch(targetPath).on('all', (event, path) => {
-        console.log(event, path, readLog());
-});
-watcher;
-
-// function from dotabuddy. Finds last line of targetPath, calls parselog on it.
-function readLog(){
-    let lines = [];
-    fs.readFileSync(targetPath).toString().split("\n").forEach(line => lines.push(line));
-    return this.parseLog(lines[lines.length - 1], lines[lines.length - 2], lines[lines.length - 3]);
-};
+let targetPath; // = server_log;
 
 let steamIds;
+let currentMatch;
 
-// function from dotabuddy. Parses log into steamIds, additional data includes date, time, game mode.
-function parseLog(lastLine, penultLine, secondLastLine) {
+document.getElementById("buttonEnterIds").addEventListener("click", manuallyEnterIds);
 
-    let regex = /(.*?) - (.*?): (.*?) \(Lobby (\d+) (\w+) (.*?)\)/, match, lastLineMatch = lastLine.match(regex), penultLineMatch, secondLastLineMatch;
-
-    if (penultLine) penultLineMatch = penultLine.match(regex);
-    if (secondLastLine) secondLastLineMatch = secondLastLine.match(regex);
-
-    if (lastLineMatch) {
-        console.log('%cParsing: %clast line is being processed.', 'color:#dd0', 'color:#eee');
-        match = lastLineMatch;
-    } else if (penultLineMatch) {
-        console.log('%cParsing: %cfirst previous line is being processed.', 'color:#dd0', 'color:#eee');
-        match = penultLineMatch;
-    } else if (secondLastLineMatch) {
-        console.log('%cParsing: %csecond previous line is being processed.', 'color:#dd0', 'color:#eee');
-        match = secondLastLineMatch;
+function manuallyEnterIds() {
+    let string = prompt("Please enter up to 10 player IDs, separated by commas:", "399920568,28070572,242885483,173971950,185001854,110448679,126238768,43276219,50828662,84429681");
+    if (string == null || string == "") {
+        text = "User cancelled the prompt.";
     } else {
-        return console.log('%cParsing: %cno match found in last line of file.', 'color:#dd0', 'color:#f33; font-style:italic');
+        let arr = JSON.parse("[" + string + "]");
+        if (arr.length > 10) return alert('Please limit to 10 Steam IDs.');
+        steamIds = arr;
+        promiseChain();
     }
-
-    console.log(match);
-
-    // I believe that dateRegex and dateSplit are the same thing?
-    let date = match[1], dateRegex = /\//, time = match[2], dateSplit = date.split("/"), timeSplit = time.split(":"), matchDatetime = new Date(dateSplit[2], dateSplit[0] - 1, dateSplit[1], timeSplit[0], timeSplit[1], timeSplit[2]), server = match[3], lobbyId = match[4], gameMode = match[5], playersString = match[6], playersRegex = /\d:(\[U:\d:\d+])/g, playersMatch;
-    steamIds = [];
-    while (playersMatch = playersRegex.exec(playersString)) {
-        let sid = playersMatch[1].substring(5, playersMatch[1].length - 1);
-        steamIds.push(sid);
-    }
-
-    // Set values for the match on globalData.
-    globalData.match = {
-        'time': matchDatetime,
-        'mode': gameMode,
-        'server': server
-    };
-    globalData.player = [];
-
-    // Affixes steamId to each player, calls promiseChain.
-    for (i = 0; i < playersTotalInGame; i++) globalData.player[i] = {'steamId': steamIds[i]};
-    return promiseChain();
-};
+}
 
 const promiseChain = async () => {
 
     // Get heroStats & gameVersion simulateously
     await Promise.all([
-        fetchAndSave(`https://api.opendota.com/api/heroStats`, globalData, `heroStats`),
-        fetchAndSave(`https://api.stratz.com/api/v1/GameVersion`, globalData, `gameVersion`)
+        fetchAndSave(`heroStats`, expiration, `https://api.opendota.com/api/heroStats`),
+        fetchAndSave(`gameVersions`, expiration, `https://api.stratz.com/api/v1/GameVersion`)
     ]);
+    gameVersions = JSON.parse(localStorage.gameVersions);
+    heroStats = JSON.parse(localStorage.heroStats);
 
     // Simultaneously get heroPerformance for each player and create hero cards.
     await Promise.all([
-        iterateThroughPlayers((i) => fetchAndSave(`https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${globalData.gameVersion[gameVersions-1].id}&gameVersionId=${globalData.gameVersion[0].id}`, globalData, `player`, i, `performance`, `access`)),
+        iterateThroughPlayers((i) => fetchAndSave(`player${steamIds[i]}patch${gameVersions[gameVersionLatest].id}`, expiration, `https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersions[gameVersionLatest].id}`)), // `?gameVersionId=` a comma-delimited array of patch IDs. Currently saving only the most recent (i.e. gameVersions[0]), but may need to add looping if fetching data from other patches.
         initializeHeroCards()
     ]);
 
     orderCards();
 
     // Simultaneously get personal data (e.g. username) and create player cards.
-    await iterateThroughPlayers((i) => fetchAndSave(`https://api.stratz.com/api/v1/Player/${steamIds[i]}`, globalData, `player`, i, `personal`, `stratzAccess`)),
+    await iterateThroughPlayers((i) => fetchAndSave(`player${steamIds[i]}`, expiration, `https://api.stratz.com/api/v1/Player/${steamIds[i]}`)),
     iterateThroughPlayers(createPlayerCards);
 };
 
-// (string, object, string, etc.)
-const fetchAndSave = async(targetUri, saveLocationParent, child, iteration, property, accessNote) => {
+const fetchAndSave = async(targetItem, expiry, targetUri) => {
     console.log(`%cFetching: %c${targetUri}`, 'color:#f4f', 'color:#eee');
     try {
-        const response = await fetch(targetUri);
-        if (property) {
-            saveLocationParent[child][iteration][property] = await response.json();
-            saveLocationParent[child][iteration][accessNote] = true;
-        } else {
-            saveLocationParent[child] = await response.json();
-        }
-        // if (accessNoteLocation) saveLocationParent[accessNoteLocation] = true;
+        let targetItemWasSaved = localStorage[`${targetItem}Retrieved`];
+        let targetItemResp = localStorage[targetItem];
+        if ( targetItemWasSaved > Date.now()-expiry ) return targetItemResp;
     } catch (error) {
         console.log(error.response);
-        saveLocationParent[child][iteration][accessNote] = false;
     }
+    await fetchThings(targetUri, targetItem);
+}
+
+const fetchThings = async(targetUri, targetItem) => {
+    const response = await fetch(targetUri);
+    let text = await response.text();
+    localStorage[targetItem] = text;
+    localStorage[`${targetItem}Retrieved`] = Date.now();
 }
 
 const iterateThroughPlayers = async(callback) => {
@@ -152,14 +82,15 @@ const iterateThroughPlayers = async(callback) => {
 };
 
 function initializeHeroCards(){
-    for (let i = 0; i < globalData.heroStats.length; i++) {
+    for (let i = 0; i < heroStats.length; i++) {
         for (let j = 0; j < 10; j++) {
             // Set up element to insert.
             let heroCard = document.createElement("div");
             heroCard.className = `heroCard player${j}`;
             optionsContainer.appendChild(heroCard);
-            heroCard.classList.add(`hero` + globalData.heroStats[i].id);
-            heroCard.setAttribute('id', `player${j}__hero${globalData.heroStats[i].id}`);
+            heroCard.classList.add(`hero` + heroStats[i].id);
+            heroCard.setAttribute('id', `player${j}__hero${heroStats[i].id}`);
+            heroCard.style.display = 'none';
         }
     }
 }
@@ -167,106 +98,80 @@ function initializeHeroCards(){
 function orderCards() {
     console.log('%cStarting orderCards', 'color:#dd0')
     // Callback for each globalData.heroStats.id
-    globalData.heroStats.forEach(hero => addPlayerProb(hero,hero.id));
+    for (let i = 0; i < playersTotalInGame; i++) {
+        applyOrderToHeroCard(i,steamIds[i]);
+    }
 }
 
-function addPlayerProb(hero,idOfHero){
-    hero.winRate = hero[`5_win`]/hero[`5_pick`];
-    // Create obj where array of objects will be saved
-    hero.playerWeights = [];
-    // Collect References to available hero data for players
-    for (let i = 0; i < playersTotalInGame; i++) {
-        if (!globalData.player[i].access || globalData.player[i].performance.length === 0) {
-            let obj = {};
-            obj[`weightedScore`] = hero.winRate;
-            obj[`activity`] = 0;
-            hero.playerWeights[i] = obj;
-            document.getElementById(`player${i}__noHeroData`).style.display = 'flex';
-        } else {
-            getWinAttempt(hero, i, globalData.player[i].performance.find(playerAsHero => playerAsHero.heroId === idOfHero));
-        }
-        // activity added, with points removed spread out equally among heroes.
-        let orderOfCards = Math.round(hero.playerWeights[i].weightedScore*-1000 - hero.playerWeights[i].activity*1000 + 1000/121);
-        document.getElementById(`player${i}__hero${idOfHero}`).style.order = orderOfCards;
-        if (hero.playerWeights[i].activity === 0) document.getElementById(`player${i}__hero${idOfHero}`).style.display = 'none';
-    }
-};
+async function applyOrderToHeroCard(i,id){
+    console.log(i,id);
+    let performanceRef = await JSON.parse(localStorage.getItem(`player${id}patch${gameVersions[gameVersionLatest].id}`));
+    console.log(performanceRef);
+    if (performanceRef.length === 0) return document.getElementById(`player${i}__noHeroData`).style.display = 'flex';
+    let totalMatchCount = findTotalMatches(performanceRef);
+    performanceRef.forEach(playerAsHero => {
+        let { convertedIMP, heroMatchCount } = heroIMPAndMatchCount(playerAsHero);
+        let orderOfCards = Math.round(multiplierForOrdering * ((weightIMP*convertedIMP) + (weightActivity * (heroMatchCount/totalMatchCount)))/(weightIMP+weightActivity));
+        document.getElementById(`player${i}__hero${playerAsHero.heroId}`).style.order = orderOfCards;
+        document.getElementById(`player${i}__hero${playerAsHero.heroId}`).style.display = 'flex';
+    });
+}
 
-// ORIGINAL, ACCOUNTING FOR META
-// function getWinAttempt(hero,i,playerAsHero) {
-//     // Array to save information
-//     let obj = {};
-//     // Takes elem as arg. If no data, returns false; else returns info found at index.
-//     if (playerAsHero === undefined) {
-//         obj[`weightedScore`] = hero.winRate;
-//         obj[`activity`] = 0;
-//         hero.playerWeights[i] = obj;
-//     } else {
-//         let convertedIMP = (playerAsHero.imp + 50)/100;
-//         obj[`winRate`] = playerAsHero.winCount / playerAsHero.matchCount;
-//         obj[`activity`] = playerAsHero.activity;
-//         // Need 4 games on a hero to be at equal weight with meta.
-//         obj[`weightedScore`] = ( ( playerAsHero.matchCount * convertedIMP ) + playerAsHero.winCount + (8 * hero.winRate)) / ( (2 * playerAsHero.matchCount) + 8);
-//         hero.playerWeights[i] = obj;
-//     }
-// }
+function findTotalMatches(playerPerformanceObj){
+    let totalMatchCount = 0;
+    playerPerformanceObj.forEach(playerAsHero => totalMatchCount += playerAsHero.matchCount);
+    return totalMatchCount;
+}
 
-// NEW, IGNORING META FOR PLAYERS WITH DATA
-function getWinAttempt(hero,i,playerAsHero) {
-    // Array to save information
-    let obj = {};
-    // Takes elem as arg. If no data, returns false; else returns info found at index.
-    if (playerAsHero === undefined) {
-        obj[`weightedScore`] = 0;
-        obj[`activity`] = 0;
-        hero.playerWeights[i] = obj;
-    } else {
-        let convertedIMP = (playerAsHero.imp + 50)/100;
-        obj[`winRate`] = playerAsHero.winCount / playerAsHero.matchCount;
-        obj[`activity`] = playerAsHero.activity;
-        obj[`weightedScore`] = ( ( playerAsHero.matchCount * convertedIMP ) + playerAsHero.winCount ) / ( 2 * playerAsHero.matchCount );
-        hero.playerWeights[i] = obj;
-    }
+// Takes each line of heroPerformance, pulls the player's hero IMP score, converts into 0-to-1 scale (compatible with percentages), and returns it.
+function heroIMPAndMatchCount(playerAsHero){
+    let convertedIMP = (playerAsHero.imp + 50)/100; // turns -50 -> 50 scale into 0 -> 1
+    return {'convertedIMP':convertedIMP, 'heroMatchCount':playerAsHero.matchCount}; // activity is already 0 -> 1.
 }
 
 const createPlayerCards = (i) => {
-    if (globalData.player[i].stratzAccess) document.querySelector(`.player${i} .player_name`).innerText = globalData.player[i].personal.steamAccount?.name;
+    let playerRef = JSON.parse(localStorage[`player${steamIds[i]}`]);
+    try {
+        document.querySelector(`.player${i} .player_name`).innerText = playerRef.steamAccount?.name;
+    } catch {
+        console.error(`Could not get player${i} name`);
+    }
     let playeri = document.querySelector(`.player${i} .player_rank`);
-    if (globalData.player[i].personal?.steamAccount?.seasonRank) {
-        let tier = globalData.player[i].personal.steamAccount.seasonRank;
-        let star = Math.floor((tier / 1) % 10), medal = Math.round(tier / 10);
+    if (playerRef.steamAccount?.seasonRank) {
+        let tier = playerRef.steamAccount.seasonRank.toString();
+        let medal = tier.charAt(0), star = tier.charAt(1);
 
         switch (medal){
-            case 1:
+            case '1':
                 playeri.innerText = `Herald ${star}`;
                 break;
         
-            case 2:
+            case '2':
                 playeri.innerText = `Guardian ${star}`;
                 break;
         
-            case 3:
+            case '3':
                 playeri.innerText = `Crusader ${star}`;
                 break;
         
-            case 4:
+            case '4':
                 playeri.innerText = `Archon ${star}`;
                 break;
 
-            case 5:
+            case '5':
                 playeri.innerText = `Legend ${star}`;
                 break;
 
-            case 6:
+            case '6':
                 playeri.innerText = `Ancient ${star}`;
                 break;
 
-            case 7:
-                playeri.innerText = `Divine ${star}`;
+            case '7':
+                playeri.innerText = `Divine ${star}`;i
                 break;
 
-            case 8:
-                playeri.innerText = `Immortal${globalData.player[i].personal.steamAccount.seasonLeaderboardRank ? ' #'+ globalData.player[i].personal.steamAccount.seasonLeaderboardRank : ''}`;
+            case '8':
+                playeri.innerText = `Immortal${playerRef.steamAccount.seasonLeaderboardRank ? ' #'+ playerRef.steamAccount.seasonLeaderboardRank : ''}`;
                 break;
         
             default:
