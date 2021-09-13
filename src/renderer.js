@@ -57,6 +57,7 @@ const promiseChain = async () => {
 };
 
 const fetchAndSave = async(targetItem, expiry, targetUri) => {
+    console.log(`%cFetching: %c${targetUri}`, 'color:#f4f', 'color:#eee');
     try {
         let targetItemWasSaved = localStorage[`${targetItem}Retrieved`];
         let targetItemResp = localStorage[targetItem];
