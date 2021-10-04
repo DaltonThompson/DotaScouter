@@ -32,6 +32,7 @@ body {
     grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
     grid-gap: 0.5em;
     grid-auto-flow: column;
+    justify-items: center;
 }
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -41,17 +42,34 @@ input::-webkit-inner-spin-button {
 form {
     display: none;
 }
-input[type=number] {
-    max-width: 11ch;
-    border-radius: 5px;
+.playerId {
+    max-width: 10ch;
     grid-row: 1;
+    margin: auto;
+}
+.playerRole {
+    max-width: 1ch;
+}
+.order-before {
+    order: -1;
+}
+.grid-row-two {
+    grid-row: 2;
+}
+input[type="number"] {
+    height: 1ch;
+    padding: 0.6em 0.45em 0.45em 0.45em;
+    border-radius: 5px;
+}
+#patch_range {
+    width: 1ch;
 }
 #buttonEnterIds {
-    border: white;
+    border: #aaa;
     border-radius: 1em;
     border-style: ridge;
     border-width: 3px;
-    padding: 7px;
+    padding: 0.5em;
     color: white;
     font-size: 0.75em;
     margin: auto;
@@ -98,6 +116,9 @@ input[type=number] {
 }
 .center_column {
     grid-column: 6;
+}
+.centered_text {
+    text-align: center;
 }
 .player0 {
     grid-column: 1;
@@ -220,7 +241,18 @@ input[type=number] {
     align-items: center;
     order: -9999;
 }
+.noPlayerData {
+    display: none;
+    // width: 100%;
+    // aspect-ratio: 16/9;
+    text-shadow: 0px 0px 10px black;
+    color: white;
+    text-align: center;
+    align-items: center;
+    // order: -9999;
+}
 .heroCard {
+    display: none;
     background-size: cover;
     text-align: center;
     padding: 5px;
@@ -231,4 +263,8 @@ input[type=number] {
     border-radius: 0.5em;
     width: 100%;
     aspect-ratio: 16/9;
+}
+label {
+    font-size: 0.5em;
+    color: #fff;
 }

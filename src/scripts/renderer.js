@@ -19,49 +19,47 @@ let targetPath; // = server_log;
 let steamIds;
 let currentMatch;
 
-document.getElementById("buttonEnterIds").addEventListener("click", manuallyEnterIds);
+document.getElementById("buttonEnterIds").addEventListener("click", seeInputBoxes);
+document.getElementById("cancelSubmission").addEventListener("click", hideInputBoxes);
+let formIds = document.getElementById("idSubmission");
+let buttonEnterIds = document.getElementById("buttonEnterIds");
 
-function manuallyEnterIds() {
-    let formIds = document.getElementById("idSubmission");
-    this.removeEventListener("click", manuallyEnterIds);
+function seeInputBoxes() {
     formIds.style = 'display: contents;';
-    this.addEventListener("click", submitIds);
-    function submitIds() {
-        console.log('start submitIds');
-        let idArray = [];
-        for (let i = 0; i < formIds.length; i++) {
-            idArray.push(formIds.elements[i].value);
-        }
-        steamIds = idArray;
-        console.log('end submitIds');
-        formIds.style = 'display: none;';
-        this.removeEventListener("click", submitIds);
-        this.addEventListener("click", manuallyEnterIds);
-        promiseChain();
-    }
+    buttonEnterIds.style = 'display: none;'
 }
+function hideInputBoxes() {
+    formIds.style = 'display: none;';
+    buttonEnterIds.style = 'display: inline-block;'
+}
+
 let validPlayers = [];
 function determineValidPlayers() {
     let arr = [];
     for (let i = 0; i < steamIds.length; i++) {
         if (steamIds[i] > 0) arr.push(i);
     }
+
     return validPlayers = arr;
 }
-const promiseChain = async () => {
+const getGlobalStats = async () => {
 
     // Get heroStats & gameVersion, and determine which steamIds are valid simultaneously
     await Promise.all([
         fetchAndSave(`heroStats`, expiration, `https://api.opendota.com/api/heroStats`),
-        fetchAndSave(`gameVersions`, expiration, `https://api.stratz.com/api/v1/GameVersion`),
-        determineValidPlayers()
+        fetchAndSave(`gameVersions`, expiration, `https://api.stratz.com/api/v1/GameVersion`)
     ]);
     gameVersions = JSON.parse(localStorage.gameVersions);
     heroStats = JSON.parse(localStorage.heroStats);
+}
 
+const promiseChain = async () => {
+
+    // Get heroStats & gameVersion, and determine which steamIds are valid simultaneously
+    await determineValidPlayers();
     // Simultaneously get heroPerformance for each player and create hero cards.
     await Promise.all([
-        iterateThroughPlayers((i) => fetchAndSave(`player${steamIds[i]}patch${gameVersions[gameVersionLatest].id}`, expiration, `https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersions[gameVersionLatest].id}`)), // `?gameVersionId=` a comma-delimited array of patch IDs. Currently saving only the most recent (i.e. gameVersions[0]), but may need to add looping if fetching data from other patches.
+        iterateThroughPlayers((i) => fetchAndSave(`player${steamIds[i]}patches${4}`, expiration, `https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersions[0].id},${gameVersions[1].id},${gameVersions[2].id},${gameVersions[3].id}`)), // `?gameVersionId=` a comma-delimited array of patch IDs. Currently saving only the most recent (i.e. gameVersions[0]), but may need to add looping if fetching data from other patches.
         initializeHeroCards()
     ]);
 
@@ -120,9 +118,17 @@ function orderCards() {
 
 async function applyOrderToHeroCard(i,id){
     console.log(i,id);
-    let performanceRef = await JSON.parse(localStorage.getItem(`player${id}patch${gameVersions[gameVersionLatest].id}`));
+    let performanceRef;
+    try {
+        performanceRef = await JSON.parse(localStorage.getItem(`player${id}patches${4}`));        
+    } catch (error) {
+        return document.getElementById(`player${i}__noHeroData`).style.display = 'flex';        
+    }
     console.log(performanceRef);
-    if (performanceRef.length === 0) return document.getElementById(`player${i}__noHeroData`).style.display = 'flex';
+    if (performanceRef.length === 0) {
+        document.querySelectorAll(`.heroCard.player${i}`).forEach(elem => elem.style = null)
+        return document.getElementById(`player${i}__noHeroData`).style.display = 'flex';
+    }
     let totalMatchCount = findTotalMatches(performanceRef);
     performanceRef.forEach(playerAsHero => {
         let { convertedIMP, heroMatchCount } = heroIMPAndMatchCount(playerAsHero);
@@ -145,54 +151,75 @@ function heroIMPAndMatchCount(playerAsHero){
 }
 
 const createPlayerCards = (i) => {
-    let playerRef = JSON.parse(localStorage[`player${steamIds[i]}`]);
+    let playerRef;
     try {
-        document.querySelector(`.player${i} .player_name`).innerText = playerRef.steamAccount?.name;
+        if (localStorage[`player${steamIds[i]}`] == '') throw 'Stratz has no player data.';
+        playerRef = JSON.parse(localStorage[`player${steamIds[i]}`]);
+        document.querySelector(`.player${i} .player_name`).innerText = playerRef?.steamAccount?.name;
+        let playeri = document.querySelector(`.player${i} .player_rank`);
+        if (playerRef.steamAccount?.seasonRank) {
+            let tier = playerRef.steamAccount.seasonRank.toString();
+            let medal = tier.charAt(0), star = tier.charAt(1);
+    
+            switch (medal){
+                case '1':
+                    playeri.innerText = `Herald ${star}`;
+                    break;
+            
+                case '2':
+                    playeri.innerText = `Guardian ${star}`;
+                    break;
+            
+                case '3':
+                    playeri.innerText = `Crusader ${star}`;
+                    break;
+            
+                case '4':
+                    playeri.innerText = `Archon ${star}`;
+                    break;
+    
+                case '5':
+                    playeri.innerText = `Legend ${star}`;
+                    break;
+    
+                case '6':
+                    playeri.innerText = `Ancient ${star}`;
+                    break;
+    
+                case '7':
+                    playeri.innerText = `Divine ${star}`;i
+                    break;
+    
+                case '8':
+                    playeri.innerText = `Immortal${playerRef.steamAccount.seasonLeaderboardRank ? ' #'+ playerRef.steamAccount.seasonLeaderboardRank : ''}`;
+                    break;
+            
+                default:
+                    playeri.innerText = `UNKNOWN`;
+            }
+        } else {
+            playeri.innerText = `UNKNOWN`;
+        }
     } catch {
         console.error(`Could not get player${i} name`);
-    }
-    let playeri = document.querySelector(`.player${i} .player_rank`);
-    if (playerRef.steamAccount?.seasonRank) {
-        let tier = playerRef.steamAccount.seasonRank.toString();
-        let medal = tier.charAt(0), star = tier.charAt(1);
-
-        switch (medal){
-            case '1':
-                playeri.innerText = `Herald ${star}`;
-                break;
-        
-            case '2':
-                playeri.innerText = `Guardian ${star}`;
-                break;
-        
-            case '3':
-                playeri.innerText = `Crusader ${star}`;
-                break;
-        
-            case '4':
-                playeri.innerText = `Archon ${star}`;
-                break;
-
-            case '5':
-                playeri.innerText = `Legend ${star}`;
-                break;
-
-            case '6':
-                playeri.innerText = `Ancient ${star}`;
-                break;
-
-            case '7':
-                playeri.innerText = `Divine ${star}`;i
-                break;
-
-            case '8':
-                playeri.innerText = `Immortal${playerRef.steamAccount.seasonLeaderboardRank ? ' #'+ playerRef.steamAccount.seasonLeaderboardRank : ''}`;
-                break;
-        
-            default:
-                playeri.innerText = `UNKNOWN`;
-        }
-    } else {
-        playeri.innerText = `UNKNOWN`;
+        // let playerElems = document.querySelectorAll(`.player${i}`);
+        // Array.from(playerElems).forEach(e => e.style.display = 'none');
+        return document.getElementById(`player${i}__noPlayerData`).style.display = 'block';        
     }
 }
+
+function useUrlQuery() {
+    let url = new URL(window.location.href);
+    let params = url.searchParams.getAll('id');
+    console.log(params);
+    steamIds = params;
+    for (let i = 0; i < steamIds.length; i++) {
+        document.getElementById(`playerId${i}`).value = steamIds[i];
+    }
+    promiseChain();
+}
+async function startProgram() {
+    await getGlobalStats();
+    useUrlQuery();
+}
+startProgram();

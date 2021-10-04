@@ -6,9 +6,9 @@ const swHelper = {
                 swHelper.SW = registration.installing || registration.waiting || registration.active;
                 console.log('%cSW: %cregistration promise resolved', 'color:#0dd', 'color:#eee')
             })
-            if (navigator.serviceWorker.controller) console.log('%cSW: %cexists', 'color:#0ff', 'color:#eee')
+            // if (navigator.serviceWorker.controller) console.log('%cSW: %cexists', 'color:#0ff', 'color:#eee')
         } else {
-            console.log('Service workers unsupported?! In Electron?!')
+            console.log('Service workers unsupported?!')
         }
     }
 };
