@@ -537,7 +537,16 @@ form {
 
 .playerId {
   max-width: 10ch;
+  grid-row: 2;
+  margin: auto;
+}
+
+.row1 {
   grid-row: 1;
+}
+
+.label_role {
+  grid-row: 3;
   margin: auto;
 }
 
@@ -612,6 +621,7 @@ input[type=number] {
   /* padding: 0 0 12px 0; */
   margin: 5px 0;
   text-align: center;
+  border-radius: 0.5em;
 }
 
 .center_column {
@@ -694,7 +704,6 @@ input[type=number] {
 
 .pick {
   /* 'display: none' until picking functionality can be added. */
-  display: none;
   aspect-ratio: 16/9;
   background-repeat: no-repeat;
   background-size: cover;
@@ -706,12 +715,12 @@ input[type=number] {
 .player_rank {
   color: #fff;
   text-shadow: 0 -1px 4px black;
-  font-size: 12px;
+  font-size: 0.75em;
 }
 
 .player_name {
   position: static;
-  width: 8vw;
+  width: 100%;
   color: #fff;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -719,9 +728,17 @@ input[type=number] {
   text-align: center;
   box-sizing: border-box;
   display: inline-block;
-  text-shadow: 0 0 2px;
   vertical-align: bottom;
   line-height: 1em;
+}
+
+.player_role {
+  width: 100%;
+  color: #aaa;
+  text-align: center;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: bottom;
 }
 
 /* Rank images: Unused for now
@@ -743,9 +760,11 @@ input[type=number] {
 .options_grid {
   padding: 0 1em 1em 1em;
   display: grid;
-  grid-template-columns: repeat(5, 1fr) 0.75fr repeat(5, 1fr);
+  grid-template-columns: repeat(5, 9%) 10% repeat(5, 9%);
   grid-gap: 0.5em;
   grid-auto-flow: column;
+  width: calc(100% - 5em);
+  box-sizing: border-box;
 }
 
 .noHeroData {
@@ -757,6 +776,7 @@ input[type=number] {
   text-align: center;
   align-items: center;
   order: -9999;
+  grid-row: span 3;
 }
 
 .noPlayerData {

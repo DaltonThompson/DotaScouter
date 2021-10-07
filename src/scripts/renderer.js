@@ -195,10 +195,10 @@ const createPlayerCards = (i) => {
                     break;
             
                 default:
-                    playeri.innerText = `UNKNOWN`;
+                    playeri.innerText = `N/A`;
             }
         } else {
-            playeri.innerText = `UNKNOWN`;
+            playeri.innerText = `N/A`;
         }
     } catch {
         console.error(`Could not get player${i} name`);
@@ -210,11 +210,12 @@ const createPlayerCards = (i) => {
 
 function useUrlQuery() {
     let url = new URL(window.location.href);
-    let params = url.searchParams.getAll('id');
-    console.log(params);
-    steamIds = params;
+    let paramId = url.searchParams.getAll('id');
+    let paramPos = url.searchParams.getAll('pos');
+    steamIds = paramId;
     for (let i = 0; i < steamIds.length; i++) {
         document.getElementById(`playerId${i}`).value = steamIds[i];
+        document.getElementById(`playerRole${i}`).value = paramPos[i];
     }
     promiseChain();
 }
