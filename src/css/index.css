@@ -714,7 +714,7 @@ input[type=number] {
 
 .player_rank {
   color: #fff;
-  text-shadow: 0 -1px 4px black;
+  text-shadow: 0 -1px 0.5em black;
   font-size: 0.75em;
 }
 
@@ -760,7 +760,7 @@ input[type=number] {
 .options_grid {
   padding: 0 1em 1em 1em;
   display: grid;
-  grid-template-columns: repeat(5, 9%) 10% repeat(5, 9%);
+  grid-template-columns: repeat(5, 9.25%) 7.5% repeat(5, 9.25%);
   grid-gap: 0.5em;
   grid-auto-flow: column;
   width: calc(100% - 5em);
