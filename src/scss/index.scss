@@ -17,6 +17,9 @@ body {
     background-size: cover;
     /* Just for easy math, width is set */
 }
+span {
+    color: #fff;
+}
 // .frame-drag {
 //     position: absolute;
 //     height: 22px;
@@ -272,7 +275,7 @@ input[type="number"] {
     // order: -9999;
 }
 .heroCard {
-    display: none;
+    display: flex;
     background-size: cover;
     text-align: center;
     padding: 5px;
@@ -287,4 +290,42 @@ input[type="number"] {
 label {
     font-size: 0.5em;
     color: #fff;
+}
+.draggable {
+    cursor: grab;
+}
+.draggable.dragging {
+    opacity: .5;
+}
+.picked {
+    display: none;
+}
+#banbox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    height: 100%;
+    grid-row-end: span 5;
+    align-content: flex-start;
+    box-shadow: 0px 0px 0.5em 0px #191919 inset;
+    border-radius: 0.5em;
+    padding: 0.5em;
+}
+#banbox > .icon {
+    display: none;
+}
+#banbox > .banned {
+    display: flex;
+}
+#ban-title {
+    width: 100%;
+    text-align: center;
+}
+.options_grid > .banned {
+    display: none;
+}
+.icon {
+    width: 2em;
+    height: 2em;
+    background-size: cover;
 }

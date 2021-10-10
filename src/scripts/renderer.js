@@ -16,6 +16,48 @@ let multiplierForOrdering = -100; // -1000 turns 0.536 into -536, useful for per
 
 // DOM references
 const optionsContainer = document.querySelector(".options_grid");
+const banBox = document.getElementById("banbox");
+const pickBoxes = document.querySelectorAll(".pick");
+let draggingElement;
+let dataHeroId;
+banBox.addEventListener("dragover", (e) => e.preventDefault());
+banBox.addEventListener("drop", () => {
+  console.log("drop~");
+  document
+    .querySelectorAll(`[data-heroId="${dataHeroId}"]`)
+    .forEach((elem) => elem.classList.add("banned"));
+});
+
+pickBoxes.forEach((pickBox) => {
+  pickBox.addEventListener("dragover", (e) => {
+    e.preventDefault();
+  });
+  pickBox.addEventListener("drop", () => {
+    //remove current image if something is there
+    let dataPickId = pickBox.getAttribute("data-heroId");
+    pickBox.classList.remove(`hero${dataPickId}`);
+    pickBox.removeAttribute("data-heroId",dataPickId)
+    document
+      .querySelectorAll(`[data-heroId="${dataPickId}"]`)
+      .forEach((elem) => elem.classList.remove("picked"));
+
+    let dataDropId = document.querySelector('.dragging').getAttribute("data-heroId");
+    document
+      .querySelectorAll(`[data-heroId="${dataDropId}"]`)
+      .forEach((elem) => elem.classList.add("picked"));
+    pickBox.classList.add(`hero${dataDropId}`);
+    pickBox.setAttribute("data-heroId",dataDropId)
+
+    pickBox.addEventListener("click", () => {
+      dataPickId = pickBox.getAttribute("data-heroId");
+      pickBox.classList.remove(`hero${dataPickId}`);
+      pickBox.removeAttribute("data-heroId",dataPickId)
+      document
+        .querySelectorAll(`[data-heroId="${dataDropId}"]`)
+        .forEach((elem) => elem.classList.remove("picked"));
+    });
+  });
+});
 
 // Declares number of players to evaluate. Only change if testing.
 let playersTotalInGame = 10;
@@ -75,7 +117,8 @@ const backupFetch = async (targetItem, backupUri) => {
 const fetchAndSave = async (targetItem, targetUri, backupUri) => {
   console.log(`%cFetching: %c${targetUri}`, "color:#f4f", "color:#eee");
   try {
-    if (!mayNeedReset && localStorage[targetItem]) return localStorage[targetItem];
+    if (!mayNeedReset && localStorage[targetItem])
+      return localStorage[targetItem];
   } catch (error) {
     // if (error === 403 ) try OpenDota API instead, if still 403, say "hidden" in UI for player.
     console.log(error.response);
@@ -138,10 +181,36 @@ function initializeHeroCards() {
       heroCard.className = `heroCard player${j}`;
       optionsContainer.appendChild(heroCard);
       heroCard.classList.add(`hero` + heroStats[i].id);
+      heroCard.classList.add(`draggable`);
       heroCard.setAttribute("id", `player${j}__hero${heroStats[i].id}`);
-      heroCard.style.display = "none";
+      heroCard.setAttribute("data-heroId", `${heroStats[i].id}`);
+      heroCard.setAttribute("draggable", true);
     }
+    let banIcon = document.createElement("div");
+    banIcon.className = `icon hero${heroStats[i].id}`;
+    banBox.appendChild(banIcon);
+    banIcon.setAttribute("data-heroId", `${heroStats[i].id}`);
+    banIcon.addEventListener('click', () => {
+      let dataPickId = banIcon.getAttribute("data-heroId")
+      document
+      .querySelectorAll(`.hero${dataPickId}`)
+      .forEach((elem) => elem.classList.remove("banned"));
+    });
+
+    // banIcon.setAttribute("draggable", true);
   }
+  draggables = document.querySelectorAll(`.draggable`);
+  draggables.forEach((draggable) => {
+    draggable.addEventListener("dragstart", () => {
+      draggable.classList.add("dragging");
+      draggingElement = document.querySelector(".dragging");
+      dataHeroId = draggingElement.getAttribute("data-heroId");
+      console.log("dragging " + dataHeroId);
+    });
+    draggable.addEventListener("dragend", () => {
+      draggable.classList.remove("dragging");
+    });
+  });
 }
 
 function orderCards() {
@@ -159,34 +228,35 @@ async function applyOrderToHeroCard(i, id) {
       localStorage.getItem(`player${id}patches${patches}`)
     );
   } catch (error) {
-    return (document.getElementById(`player${i}__noHeroData`).style.display =
-      "flex");
+    // return (document.getElementById(`player${i}__noHeroData`).style.display =
+    //   "flex");
   }
   console.log(performanceRef);
   if (performanceRef.length === 0) {
-    document
-      .querySelectorAll(`.heroCard.player${i}`)
-      .forEach((elem) => (elem.style = null));
+    // document
+    //   .querySelectorAll(`.heroCard.player${i}`)
+    //   .forEach((elem) => (elem.style = null));
     return (document.getElementById(`player${i}__noHeroData`).style.display =
       "flex");
   }
   let totalMatchCount = findTotalMatches(performanceRef);
   performanceRef.forEach((playerAsHero) => {
-    let { convertedIMP, heroMatchCount, winCount } = heroIMPAndMatchCount(playerAsHero);
+    let { convertedIMP, heroMatchCount, winCount } =
+      heroIMPAndMatchCount(playerAsHero);
     let orderOfCards = Math.round(
       (multiplierForOrdering *
         (weightIMP * convertedIMP +
-          (weightWinrate * winCount / heroMatchCount) +
+          (weightWinrate * winCount) / heroMatchCount +
           weightActivity * (heroMatchCount / totalMatchCount))) /
         (weightIMP + weightActivity + weightWinrate)
     );
     document.getElementById(
       `player${i}__hero${playerAsHero.heroId}`
     ).style.order = orderOfCards;
-    if (heroMatchCount > 0)
-      document.getElementById(
-        `player${i}__hero${playerAsHero.heroId}`
-      ).style.display = "flex";
+    // if (heroMatchCount > 0)
+    //   document.getElementById(
+    //     `player${i}__hero${playerAsHero.heroId}`
+    //   ).style.display = "flex";
   });
 }
 
@@ -204,13 +274,13 @@ function heroIMPAndMatchCount(playerAsHero) {
     return {
       convertedIMP: 0,
       heroMatchCount: playerAsHero.matchCount,
-      winCount: playerAsHero.winCount
+      winCount: playerAsHero.winCount,
     };
   let convertedIMP = (playerAsHero.imp + 100) / 200; // turns -100 -> 100 into 0 -> 1
   return {
     convertedIMP: convertedIMP,
     heroMatchCount: playerAsHero.matchCount,
-    winCount: playerAsHero.winCount
+    winCount: playerAsHero.winCount,
   };
 }
 
