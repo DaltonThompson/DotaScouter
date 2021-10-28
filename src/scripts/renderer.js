@@ -518,13 +518,23 @@ function useUrlQuery() {
   promiseChain();
 }
 
+let matchUps;
 async function startProgram() {
   if (lastResetTime < Date.now() - expiration) {
-    let matchUps = localStorage.getItem(`matchUps`);
-    let matchUpsLogTime = localStorage.getItem(`matchUpsLogTime`);
+    let matchUpsLogTime;
+    const defaultMatchups = async () => {
+      fetch("../matchups.json")
+        .then((res) => res.json())
+        .then((data) => matchUps = data);
+    };
+
+    !localStorage.getItem(`matchUps`)
+      ? defaultMatchups() && (matchUpsLogTime = "0")
+      : (matchUps = JSON.parse(localStorage.getItem(`matchUps`))) &&
+        (matchUpsLogTime = JSON.parse(localStorage.getItem(`matchUpsLogTime`)));
     localStorage.clear();
     localStorage.setItem("lastResetTime", Date.now());
-    localStorage.setItem(`matchUps`, matchUps);
+    localStorage.setItem(`matchUps`, JSON.stringify(matchUps));
     localStorage.setItem(`matchUpsLogTime`, matchUpsLogTime);
   }
   mayNeedReset = false;
@@ -591,7 +601,6 @@ async function getMatchups(id, take) {
 }
 
 function findBestSynergyCounter(heroId, allyArray, enemyArray, bans) {
-  let matchUps = JSON.parse(localStorage.getItem(`matchUps`));
   let matchUpsOfHero = matchUps.find((element) => element.heroId == heroId);
   let matchUpsOfHeroSpliced = matchUpsOfHero;
 
