@@ -15,6 +15,7 @@ body {
     background: linear-gradient(colors.$background-dark, colors.$background-light);
     background-repeat: no-repeat;
     background-size: cover;
+    padding: 1em;
     /* Just for easy math, width is set */
 }
 span {
@@ -194,6 +195,7 @@ input[type="number"] {
 .pick {
     /* 'display: none' until picking functionality can be added. */
     // display: none;
+    border-radius: 0.5em 0.5em 0 0;
     aspect-ratio: 16/9;
     background-repeat: no-repeat;
     background-size: cover;
@@ -204,6 +206,8 @@ input[type="number"] {
     color: #fff;
     text-shadow: 0 -1px 0.5em black;
     font-size: .75em;
+    white-space: nowrap;
+    overflow: hidden;
 }
 .player_name {
     position: static;
@@ -227,6 +231,12 @@ input[type="number"] {
     display: inline-block;
     // text-shadow: 0 0 2px;
     vertical-align: bottom;
+    font-size: 0.8rem;
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 0.8rem;
+    white-space: nowrap;
 }
 /* Rank images: Unused for now
     .rankCard {
@@ -245,7 +255,7 @@ input[type="number"] {
     } 
 */
 .options_grid {
-    padding: 0 1em 1em 1em;
+    // padding: 0 1em 1em 1em;
     display: grid;
     grid-template-columns: repeat(5, 9.25%) 7.5% repeat(5, 9.25%);
     grid-gap: 0.5em;
@@ -256,7 +266,7 @@ input[type="number"] {
 .noHeroData {
     display: none;
     width: 100%;
-    aspect-ratio: 16/9;
+    // aspect-ratio: 16/9;
     text-shadow: 0px 0px 10px black;
     color: white;
     text-align: center;
@@ -275,17 +285,19 @@ input[type="number"] {
     // order: -9999;
 }
 .heroCard {
-    display: flex;
-    background-size: cover;
+    // display: flex;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     text-align: center;
-    padding: 5px;
+    padding: 0.75rem 0.75rem 0.5rem 0.75rem;
     box-sizing: border-box;
     text-shadow: 0px 0px 10px black;
     color: white;
     box-shadow: 0 2px 5px 0px black;
     border-radius: 0.5em;
     width: 100%;
-    aspect-ratio: 16/9;
+    // aspect-ratio: 16/9;
 }
 label {
     font-size: 0.5em;
@@ -307,7 +319,8 @@ label {
     height: 100%;
     grid-row-end: span 5;
     align-content: flex-start;
-    box-shadow: 0px 0px 0.5em 0px #191919 inset;
+    // box-shadow: 0px 0px 0.5em 0px #191919 inset;
+    box-shadow: 0 2px 5px 0 #000 inset, 0 0px 1px 0 #fff inset;
     border-radius: 0.5em;
     padding: 0.5em;
 }
@@ -316,6 +329,7 @@ label {
 }
 #banbox > .banned {
     display: flex;
+    opacity: 0.8;
 }
 #ban-title {
     width: 100%;
@@ -328,4 +342,48 @@ label {
     width: 2em;
     height: 2em;
     background-size: cover;
+}
+.glow {
+    filter: drop-shadow(0 0 0.25em white);
+    background-image: none;
+    background-color: #555;
+    // box-shadow: 0 2px 5px 0 #000 inset, 0 0px 1px 0 #fff inset;
+}
+.heroCard .heroIcon {
+    // user-select: none;
+    pointer-events:none;
+    height: 2.5rem;
+    margin: auto;
+    float: left;
+}
+.heroCard .container {
+    width: 100%;
+    clear: both;
+    pointer-events:none;
+}
+.cardTitle {
+    float: left;
+    opacity: 0.8;
+    font-size: 0.8rem;
+    margin: 0.1rem 0;
+}
+.cardData {
+    float: right;
+}
+.heroScore {
+    margin: 0.75rem 0.25rem;
+}
+.heroCard:not(.expanded) .collapsingCard {
+    display: none;
+}
+.collapsingCard  {
+    pointer-events:none;
+}
+.unknownValue {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin: 0.1rem 0;
+}
+.heroCard.expanded {
+    grid-row-end: span 2;
 }

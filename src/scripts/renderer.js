@@ -11,8 +11,9 @@ let gameVersionsToUseString;
 
 let weightIMP = 1; // IMP is 'Individual Match Performance' provided by Stratz
 let weightActivity = 1; // Activity currently refers to a directly calculated percent of all matches in which the hero is played.
-let weightWinrate = 1;
-let multiplierForOrdering = -100; // -1000 turns 0.536 into -536, useful for percents where the first decimal matters, and must be negative to display in descending order.
+let weightWinrate = 0.5; // 0% is an unplayed hero, 100% is a most played hero.
+let weightAdvantage = 0.5;
+let multiplierForOrdering = 1000; // -1000 turns 0.536 into -536, useful for percents where the first decimal matters, and must be negative to display in descending order.
 
 // DOM references
 const optionsContainer = document.querySelector(".options_grid");
@@ -27,36 +28,53 @@ banBox.addEventListener("drop", () => {
     .querySelectorAll(`[data-heroId="${dataHeroId}"]`)
     .forEach((elem) => elem.classList.add("banned"));
 });
-
-pickBoxes.forEach((pickBox) => {
-  pickBox.addEventListener("dragover", (e) => {
-    e.preventDefault();
-  });
-  pickBox.addEventListener("drop", () => {
-    //remove current image if something is there
-    let dataPickId = pickBox.getAttribute("data-heroId");
-    pickBox.classList.remove(`hero${dataPickId}`);
-    pickBox.removeAttribute("data-heroId",dataPickId)
+banBox.addEventListener("click", (e) => {
+  if (e.target.classList.contains("banned")) {
+    dataHeroId = e.target.getAttribute("data-heroId");
     document
-      .querySelectorAll(`[data-heroId="${dataPickId}"]`)
-      .forEach((elem) => elem.classList.remove("picked"));
+      .querySelectorAll(`.hero${dataHeroId}`)
+      .forEach((elem) => elem.classList.remove("banned"));
+  }
+});
 
-    let dataDropId = document.querySelector('.dragging').getAttribute("data-heroId");
+optionsContainer.addEventListener("dragover", (e) => {
+  if (
+    e.target.parentElement.classList.contains("player_border") ||
+    e.target.classList.contains("pick")
+  ) {
+    e.preventDefault();
+  }
+});
+optionsContainer.addEventListener("drop", (e) => {
+  if (
+    e.target.parentElement.classList.contains("player_border") ||
+    e.target.classList.contains("pick")
+  ) {
+    const targetPickBox = e.target.parentElement.querySelector(".pick");
+    dataDropId = targetPickBox.getAttribute("data-heroId");
+    targetPickBox.classList.remove(`hero${dataDropId}`);
+    targetPickBox.removeAttribute("data-heroId", dataDropId);
     document
       .querySelectorAll(`[data-heroId="${dataDropId}"]`)
+      .forEach((elem) => elem.classList.remove("picked"));
+    let dataHeroId = document
+      .querySelector(".dragging")
+      .getAttribute("data-heroId");
+    document
+      .querySelectorAll(`[data-heroId="${dataHeroId}"]`)
       .forEach((elem) => elem.classList.add("picked"));
-    pickBox.classList.add(`hero${dataDropId}`);
-    pickBox.setAttribute("data-heroId",dataDropId)
+    targetPickBox.classList.add(`hero${dataHeroId}`);
+    targetPickBox.setAttribute("data-heroId", dataHeroId);
 
-    pickBox.addEventListener("click", () => {
-      dataPickId = pickBox.getAttribute("data-heroId");
-      pickBox.classList.remove(`hero${dataPickId}`);
-      pickBox.removeAttribute("data-heroId",dataPickId)
+    targetPickBox.addEventListener("click", () => {
+      dataDropId = targetPickBox.getAttribute("data-heroId");
+      targetPickBox.classList.remove(`hero${dataDropId}`);
+      targetPickBox.removeAttribute("data-heroId", dataDropId);
       document
-        .querySelectorAll(`[data-heroId="${dataDropId}"]`)
+        .querySelectorAll(`[data-heroId="${dataHeroId}"]`)
         .forEach((elem) => elem.classList.remove("picked"));
     });
-  });
+  }
 });
 
 // Declares number of players to evaluate. Only change if testing.
@@ -180,36 +198,119 @@ function initializeHeroCards() {
       let heroCard = document.createElement("div");
       heroCard.className = `heroCard player${j}`;
       optionsContainer.appendChild(heroCard);
-      heroCard.classList.add(`hero` + heroStats[i].id);
-      heroCard.classList.add(`draggable`);
+      heroCard.classList.add(`hero${heroStats[i].id}`, `draggable`);
       heroCard.setAttribute("id", `player${j}__hero${heroStats[i].id}`);
       heroCard.setAttribute("data-heroId", `${heroStats[i].id}`);
       heroCard.setAttribute("draggable", true);
+
+      let heroCardPrimaryContainer = document.createElement("div");
+      let heroIcon = document.createElement("img");
+      let heroScore = document.createElement("span");
+      heroCardPrimaryContainer.classList.add(`container`);
+      heroIcon.classList.add(`heroIcon`, `hero${heroStats[i].id}`, `draggable`);
+      heroScore.className = `heroScore hero${heroStats[i].id} cardData`;
+      heroIcon.setAttribute("draggable", true);
+      heroIcon.setAttribute("data-heroId", `${heroStats[i].id}`);
+      heroCardPrimaryContainer.appendChild(heroIcon);
+      heroCardPrimaryContainer.appendChild(heroScore);
+      heroCard.appendChild(heroCardPrimaryContainer);
+
+      let collapsingCard = document.createElement("div");
+      collapsingCard.className = `collapsingCard`;
+
+      let matchCountContainer = document.createElement("div");
+      let elemTitleMatchCount = document.createElement("span");
+      let elemMatchCount = document.createElement("span");
+      matchCountContainer.className = `container container__matchCount`;
+      elemTitleMatchCount.className = `cardTitle cardTitle__matchCount`;
+      elemTitleMatchCount.innerText = "Matches";
+      elemMatchCount.className = `matchCount cardData`;
+      matchCountContainer.appendChild(elemTitleMatchCount);
+      matchCountContainer.appendChild(elemMatchCount);
+
+      let winRateContainer = document.createElement("div");
+      let elemTitleWinRate = document.createElement("span");
+      let elemWinRate = document.createElement("span");
+      winRateContainer.className = `container container__winRate`;
+      elemTitleWinRate.className = `cardTitle cardTitle__winRate`;
+      elemTitleWinRate.innerText = "Win";
+      elemWinRate.className = `winRate cardData`;
+      winRateContainer.appendChild(elemTitleWinRate);
+      winRateContainer.appendChild(elemWinRate);
+
+      let heroIMPContainer = document.createElement("div");
+      let elemIMP = document.createElement("span");
+      let elemTitleIMP = document.createElement("span");
+      heroIMPContainer.className = `container container__heroIMPContainer`;
+      elemTitleIMP.className = `cardTitle cardTitle__heroIMP`;
+      elemTitleIMP.innerText = "IMP";
+      elemIMP.className = `heroIMP cardData`;
+      heroIMPContainer.appendChild(elemTitleIMP);
+      heroIMPContainer.appendChild(elemIMP);
+
+      let advantageContainer = document.createElement("div");
+      let elemAdvScore = document.createElement("span");
+      let elemTitleAdv = document.createElement("span");
+      advantageContainer.className = `container container__advantage`;
+      elemTitleAdv.className = `cardTitle cardTitle__advantage`;
+      elemTitleAdv.innerText = "Advantage";
+      elemAdvScore.className = `advantage cardData`;
+      advantageContainer.appendChild(elemTitleAdv);
+      advantageContainer.appendChild(elemAdvScore);
+
+      collapsingCard.appendChild(matchCountContainer);
+      collapsingCard.appendChild(winRateContainer);
+      collapsingCard.appendChild(heroIMPContainer);
+      collapsingCard.appendChild(advantageContainer);
+      heroCard.appendChild(collapsingCard);
     }
     let banIcon = document.createElement("div");
-    banIcon.className = `icon hero${heroStats[i].id}`;
+    banIcon.className = `icon heroIcon hero${heroStats[i].id}`;
     banBox.appendChild(banIcon);
     banIcon.setAttribute("data-heroId", `${heroStats[i].id}`);
-    banIcon.addEventListener('click', () => {
-      let dataPickId = banIcon.getAttribute("data-heroId")
-      document
-      .querySelectorAll(`.hero${dataPickId}`)
-      .forEach((elem) => elem.classList.remove("banned"));
-    });
 
     // banIcon.setAttribute("draggable", true);
   }
   draggables = document.querySelectorAll(`.draggable`);
-  draggables.forEach((draggable) => {
-    draggable.addEventListener("dragstart", () => {
-      draggable.classList.add("dragging");
+
+  optionsContainer.addEventListener("dragstart", (e) => {
+    const dragAndGlow = (targetElem) => {
+      console.log("dragAndGlow");
+      targetElem.classList.add("dragging");
+      banBox.classList.add("glow");
+      pickBoxes.forEach((pickBox) => pickBox.classList.add("glow"));
       draggingElement = document.querySelector(".dragging");
-      dataHeroId = draggingElement.getAttribute("data-heroId");
-      console.log("dragging " + dataHeroId);
-    });
-    draggable.addEventListener("dragend", () => {
-      draggable.classList.remove("dragging");
-    });
+      console.log(draggingElement);
+      dataHeroId = targetElem.getAttribute("data-heroId");
+      document
+        .querySelectorAll(`.hero${dataHeroId}`)
+        .forEach((elem) => elem.classList.remove("banned"));
+    };
+    console.log(e.target);
+    if (e.target.classList.contains("heroCard")) {
+      console.log("dragging");
+      dragAndGlow(e.target);
+    }
+  });
+  optionsContainer.addEventListener("dragend", (e) => {
+    if (e.target.classList.contains("heroCard")) {
+      e.target.classList.remove("dragging");
+      banBox.classList.remove("glow");
+      pickBoxes.forEach((pickBox) => pickBox.classList.remove("glow"));
+    }
+  });
+  optionsContainer.addEventListener("click", (e) => {
+    if (
+      e.target.classList.contains("heroCard") &&
+      !e.target.classList.contains("expanded")
+    ) {
+      e.target.classList.add("expanded");
+    } else if (
+      e.target.classList.contains("heroCard") &&
+      e.target.classList.contains("expanded")
+    ) {
+      e.target.classList.remove("expanded");
+    }
   });
 }
 
@@ -239,44 +340,71 @@ async function applyOrderToHeroCard(i, id) {
     return (document.getElementById(`player${i}__noHeroData`).style.display =
       "flex");
   }
-  let totalMatchCount = findTotalMatches(performanceRef);
+  let { totalMatchCount, totalHeroesPlayed, mostPlayedPerHero } =
+    findTotalMatches(performanceRef);
+  console.log(mostPlayedPerHero);
   performanceRef.forEach((playerAsHero) => {
     let { convertedIMP, heroMatchCount, winCount } =
       heroIMPAndMatchCount(playerAsHero);
+    if (convertedIMP) {
+      document.querySelector(
+        `#player${i}__hero${playerAsHero.heroId} .heroIMP`
+      ).innerText = Math.round(convertedIMP * 100 - 50);
+    } else {
+      document.querySelector(
+        `#player${i}__hero${playerAsHero.heroId} .heroIMP`
+      ).innerText = "N/A";
+      document
+        .querySelector(`#player${i}__hero${playerAsHero.heroId} .heroIMP`)
+        .classList.add("unknownValue");
+      convertedIMP = 0.5;
+    }
     let orderOfCards = Math.round(
       (multiplierForOrdering *
         (weightIMP * convertedIMP +
-          (weightWinrate * winCount) / heroMatchCount +
-          weightActivity * (heroMatchCount / totalMatchCount))) /
+          weightWinrate * (winCount / heroMatchCount) +
+          weightActivity * (heroMatchCount / mostPlayedPerHero))) /
         (weightIMP + weightActivity + weightWinrate)
     );
     document.getElementById(
       `player${i}__hero${playerAsHero.heroId}`
-    ).style.order = orderOfCards;
-    // if (heroMatchCount > 0)
-    //   document.getElementById(
-    //     `player${i}__hero${playerAsHero.heroId}`
-    //   ).style.display = "flex";
+    ).style.order = -orderOfCards;
+    if (orderOfCards) {
+      document.querySelector(
+        `#player${i}__hero${playerAsHero.heroId} .heroScore`
+      ).innerText = Math.round((orderOfCards - multiplierForOrdering / 2) / 10);
+    }
+    if (heroMatchCount > 0) {
+      document.querySelector(
+        `#player${i}__hero${playerAsHero.heroId} .winRate`
+      ).innerText = Math.round((100 * winCount) / heroMatchCount) + "%";
+      document.querySelector(
+        `#player${i}__hero${playerAsHero.heroId} .matchCount`
+      ).innerText = heroMatchCount;
+    }
   });
 }
 
 function findTotalMatches(playerPerformanceObj) {
   let totalMatchCount = 0;
-  playerPerformanceObj.forEach(
-    (playerAsHero) => (totalMatchCount += playerAsHero.matchCount)
-  );
-  return totalMatchCount;
+  let totalHeroesPlayed = 0;
+  let mostPlayedPerHero = 0;
+  playerPerformanceObj.forEach((playerAsHero) => {
+    totalMatchCount += playerAsHero.matchCount;
+    if (playerAsHero.matchCount > 0) totalHeroesPlayed++;
+    if (mostPlayedPerHero < playerAsHero.matchCount) {
+      mostPlayedPerHero = playerAsHero.matchCount;
+      console.log(mostPlayedPerHero);
+    }
+  });
+  return { totalMatchCount, totalHeroesPlayed, mostPlayedPerHero };
 }
 
 // Takes each line of heroPerformance, pulls the player's hero IMP score, converts into 0-to-1 scale (compatible with percentages), and returns it.
 function heroIMPAndMatchCount(playerAsHero) {
-  if (!playerAsHero.imp)
-    return {
-      convertedIMP: 0,
-      heroMatchCount: playerAsHero.matchCount,
-      winCount: playerAsHero.winCount,
-    };
-  let convertedIMP = (playerAsHero.imp + 100) / 200; // turns -100 -> 100 into 0 -> 1
+  let convertedIMP;
+  if (playerAsHero.imp !== undefined)
+    convertedIMP = (playerAsHero.imp + 100) / 200; // turns -100 -> 100 into 0 -> 1
   return {
     convertedIMP: convertedIMP,
     heroMatchCount: playerAsHero.matchCount,
@@ -357,21 +485,47 @@ function useUrlQuery() {
   steamIds = paramId;
   for (let i = 0; i < steamIds.length; i++) {
     document.getElementById(`playerId${i}`).value = steamIds[i];
-    document.getElementById(`playerRole${i}`).value = paramPos[i];
-    document.getElementById(`patches`).value = patches;
   }
+  for (let i = 0; i < paramPos.length; i++) {
+    let roleToInsert;
+    switch (paramPos[i]) {
+      default:
+        roleToInsert = "N/A";
+        break;
+      case "1":
+        roleToInsert = "Carry";
+        break;
+      case "2":
+        roleToInsert = "Mid";
+        break;
+      case "3":
+        roleToInsert = "Offlane";
+        break;
+      case "4":
+        roleToInsert = "Soft Support";
+        break;
+      case "5":
+        roleToInsert = "Hard Support";
+        break;
+    }
+    document.getElementById(`player${i}__player_role`).innerText = roleToInsert;
+  }
+  document.getElementById(`patches`).value = patches;
   let gameVersionToUseArray = [];
-  for (let i = 0; i < patches; i++) {
+  for (let i = 0; i < patches; i++)
     gameVersionToUseArray.push(gameVersions[i].id);
-  }
   gameVersionsToUseString = gameVersionToUseArray.toString();
   promiseChain();
 }
 
 async function startProgram() {
   if (lastResetTime < Date.now() - expiration) {
+    let matchUps = localStorage.getItem(`matchUps`);
+    let matchUpsLogTime = localStorage.getItem(`matchUpsLogTime`);
     localStorage.clear();
     localStorage.setItem("lastResetTime", Date.now());
+    localStorage.setItem(`matchUps`, matchUps);
+    localStorage.setItem(`matchUpsLogTime`, matchUpsLogTime);
   }
   mayNeedReset = false;
   await getGlobalStats();
@@ -379,3 +533,186 @@ async function startProgram() {
 }
 
 startProgram();
+
+let matchUpArray = [];
+const iterateThroughHeroes = async (callback) => {
+  let promiseArray = [];
+  for (let i = 0; i < heroStats.length; i++)
+    promiseArray.push(callback(heroStats[i].id));
+  return Promise.all(promiseArray);
+};
+
+const getAllMatchups = () =>
+  iterateThroughHeroes((id) => getMatchups(id, heroStats.length - 1));
+
+async function getMatchups(id, take) {
+  const query = `query matchupQuery {
+      heroStats {
+          matchUp(heroId:${id}, take:${take}) {
+              heroId
+              with {
+                  heroId2
+                  count
+                  wins
+                  synergy
+              }
+              vs {
+                  heroId2
+                  count
+                  wins
+                  synergy
+              }
+          }
+      }
+  }`;
+  async function setResponse(repeatCount) {
+    const response = await fetch("https://api.stratz.com/graphql", {
+      credentials: "omit",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        query,
+      }),
+    });
+    if (response.status === 429 && repeatCount < 10) {
+      setTimeout(setResponse(repeatCount + 1), 3000 * repeatCount);
+      console.log(repeatCount);
+    }
+    if (response.status === 200) {
+      let text = await response.text();
+      let parsed = JSON.parse(text).data.heroStats.matchUp[0];
+      matchUpArray.push(parsed);
+    }
+  }
+  setResponse(0);
+}
+
+function findBestSynergyCounter(heroId, allyArray, enemyArray, bans) {
+  let matchUps = JSON.parse(localStorage.getItem(`matchUps`));
+  let matchUpsOfHero = matchUps.find((element) => element.heroId == heroId);
+  let matchUpsOfHeroSpliced = matchUpsOfHero;
+
+  for (let i = 0; i < matchUpsOfHeroSpliced.vs.length; i++) {
+    if (bans?.includes(matchUpsOfHeroSpliced.vs[i].heroId2))
+      matchUpsOfHeroSpliced.vs.splice(i, 1);
+  }
+  for (let i = 0; i < matchUpsOfHeroSpliced.with.length; i++) {
+    if (bans?.includes(matchUpsOfHeroSpliced.with[i].heroId2))
+      matchUpsOfHeroSpliced.with.splice(i, 1);
+  }
+
+  let strongestCounters = matchUpsOfHeroSpliced.vs.slice(
+    matchUpsOfHeroSpliced.vs.length + enemyArray?.length - 5,
+    matchUpsOfHeroSpliced.vs.length
+  );
+  enemyArray?.forEach((heroId2) => {
+    strongestCounters.push(
+      matchUpsOfHeroSpliced.vs.find((element) => element.heroId2 == heroId2)
+    );
+  });
+
+  let strongestCountersScore = 0;
+  strongestCounters.forEach((elem) => {
+    if (elem?.synergy) strongestCountersScore += elem.synergy;
+  });
+
+  let strongestTeam = matchUpsOfHeroSpliced.with.slice(
+    0,
+    4 - allyArray?.length
+  );
+  allyArray?.forEach((heroId2) => {
+    strongestTeam.push(
+      matchUpsOfHeroSpliced.with.find((element) => element.heroId2 == heroId2)
+    );
+  });
+
+  let strongestTeamScore = 0;
+  console.log(strongestTeam);
+  strongestTeam.forEach((elem) => {
+    if (elem?.synergy) strongestTeamScore += elem.synergy;
+  });
+
+  let totalPickScore = strongestCountersScore + strongestTeamScore;
+
+  return {
+    strongestCounters,
+    strongestCountersScore,
+    strongestTeam,
+    strongestTeamScore,
+    totalPickScore,
+  };
+}
+
+function applyAdvScore(player, heroId) {
+  document.querySelector(
+    `#player${player}__hero${heroId} > div.collapsingCard > div.container.container__advantage > span.advantage.cardData`
+  ).innerText = Math.round(
+    findBestSynergyCounter(heroId, allyArray, enemyArray, bans)[4]
+  );
+}
+
+const getPickBanArrays = () => {
+  let pickArray = document.querySelectorAll(`.pick`);
+  let radiantArray = [];
+  let direArray = [];
+  let allPicks = [];
+  for (let i = 0; i < pickArray.length; i++) {
+    let pickId = pickArray[i].getAttribute(`data-heroId`);
+    allPicks.push(pickId);
+    if (pickId && i < 5) {
+      radiantArray.push(pickId);
+    }
+    if (pickId && i >= 5) direArray.push(pickId);
+  }
+
+  let banArray = document.querySelectorAll(`#banbox .banned`);
+  let bans = [];
+  for (let i = 0; i < banArray.length; i++) {
+    let banId = banArray[i].getAttribute(`data-heroId`);
+    if (banId) bans.push(banId);
+  }
+  return { allPicks, radiantArray, direArray, bans };
+};
+
+// async function applyAllAdv() {
+//   for (let i = 0; i < 10; i++) {
+//     for (let j = 0; j < heroStats.length; j++) {
+//       applyAdvScore(i, heroStats[j].id);
+//     }
+//   }
+// }
+async function applyAllAdv2() {
+  let { allPicks, radiantArray, direArray, bans } = getPickBanArrays();
+  let heroAdv = iterateThroughHeroes((heroId) => {
+    let radiantAdv;
+    let direAdv;
+    if (!allPicks.includes(heroId) && !bans.includes(heroId)) {
+      // iterateThroughPlayers((i) => applyAdvScore(i, j));
+      radiantAdv = findBestSynergyCounter(
+        heroId,
+        radiantArray,
+        direArray,
+        bans
+      ).totalPickScore;
+      direAdv = findBestSynergyCounter(
+        heroId,
+        direArray,
+        radiantArray,
+        bans
+      ).totalPickScore;
+      for (let radiantPlayer = 0; radiantPlayer < 5; radiantPlayer++) {
+        document.querySelector(
+          `#player${radiantPlayer}__hero${heroId} > div.collapsingCard > div.container.container__advantage > span.advantage.cardData`
+        ).innerText = Math.round(radiantAdv);
+      }
+      for (let direPlayer = 5; direPlayer < 10; direPlayer++) {
+        document.querySelector(
+          `#player${direPlayer}__hero${heroId} > div.collapsingCard > div.container.container__advantage > span.advantage.cardData`
+        ).innerText = Math.round(direAdv);
+      }
+    }
+  });
+}
