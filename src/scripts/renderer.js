@@ -1,5 +1,8 @@
 let mayNeedReset = true;
-let lastResetTime = localStorage.getItem("lastResetTime");
+let lastResetTime;
+localStorage.getItem("lastResetTime")
+  ? (lastResetTime = localStorage.getItem("lastResetTime"))
+  : (lastResetTime = localStorage.setItem("lastResetTime", Date.now()));
 let expiration = 3600000 * 2; // Integer in ms. 3600000 ms === 1 hr
 let gameVersions; // Array to be read from cache/localStorage or fetched.
 
