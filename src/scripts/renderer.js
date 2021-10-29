@@ -23,10 +23,11 @@ let draggingElement;
 let dataHeroId;
 banBox.addEventListener("dragover", (e) => e.preventDefault());
 banBox.addEventListener("drop", () => {
-  console.log("drop~");
   document
     .querySelectorAll(`[data-heroId="${dataHeroId}"]`)
     .forEach((elem) => elem.classList.add("banned"));
+  applyAdvantages();
+  orderCards();
 });
 banBox.addEventListener("click", (e) => {
   if (e.target.classList.contains("banned")) {
@@ -34,6 +35,8 @@ banBox.addEventListener("click", (e) => {
     document
       .querySelectorAll(`.hero${dataHeroId}`)
       .forEach((elem) => elem.classList.remove("banned"));
+    applyAdvantages();
+    orderCards();
   }
 });
 
@@ -73,7 +76,11 @@ optionsContainer.addEventListener("drop", (e) => {
       document
         .querySelectorAll(`[data-heroId="${dataHeroId}"]`)
         .forEach((elem) => elem.classList.remove("picked"));
+      applyAdvantages();
+      orderCards();
     });
+    applyAdvantages();
+    orderCards();
   }
 });
 
@@ -120,7 +127,7 @@ const fetchThings = async (targetUri, targetItem, backupUri) => {
 };
 
 const backupFetch = async (targetItem, backupUri) => {
-  console.log(`%cFetching backup: %c${backupUri}`, "color:#f4f", "color:#eee");
+  // console.log(`%cFetching backup: %c${backupUri}`, "color:#f4f", "color:#eee");
   const response = await fetch(backupUri);
   if (response.status === 200) {
     let obj = await response.text();
@@ -133,7 +140,7 @@ const backupFetch = async (targetItem, backupUri) => {
 };
 
 const fetchAndSave = async (targetItem, targetUri, backupUri) => {
-  console.log(`%cFetching: %c${targetUri}`, "color:#f4f", "color:#eee");
+  // console.log(`%cFetching: %c${targetUri}`, "color:#f4f", "color:#eee");
   try {
     if (!mayNeedReset && localStorage[targetItem])
       return localStorage[targetItem];
@@ -171,7 +178,7 @@ const promiseChain = async () => {
     ), // `?gameVersionId=` a comma-delimited array of patch IDs. Currently saving only the most recent (i.e. gameVersions[0]), but may need to add looping if fetching data from other patches.
     initializeHeroCards(),
   ]);
-
+  await applyAdvantages();
   orderCards();
 
   // Simultaneously get personal data (e.g. username) and create player cards.
@@ -322,7 +329,7 @@ function orderCards() {
 }
 
 async function applyOrderToHeroCard(i, id) {
-  console.log(i, id);
+  // console.log(i, id);
   let performanceRef;
   try {
     performanceRef = await JSON.parse(
@@ -332,7 +339,6 @@ async function applyOrderToHeroCard(i, id) {
     // return (document.getElementById(`player${i}__noHeroData`).style.display =
     //   "flex");
   }
-  console.log(performanceRef);
   if (performanceRef.length === 0) {
     // document
     //   .querySelectorAll(`.heroCard.player${i}`)
@@ -342,7 +348,6 @@ async function applyOrderToHeroCard(i, id) {
   }
   let { totalMatchCount, totalHeroesPlayed, mostPlayedPerHero } =
     findTotalMatches(performanceRef);
-  console.log(mostPlayedPerHero);
   performanceRef.forEach((playerAsHero) => {
     let { convertedIMP, heroMatchCount, winCount } =
       heroIMPAndMatchCount(playerAsHero);
@@ -359,12 +364,22 @@ async function applyOrderToHeroCard(i, id) {
         .classList.add("unknownValue");
       convertedIMP = 0.5;
     }
+    let heroAdvScore = 0;
+    if (advCalculated.find((elem) => elem.heroId == playerAsHero.heroId)) {
+      let heroAdvObj = advCalculated.find(
+        (elem) => elem.heroId == playerAsHero.heroId
+      );
+      i < 5
+        ? (heroAdvScore = heroAdvObj.radiantAdv)
+        : (heroAdvScore = heroAdvObj.direAdv);
+    }
     let orderOfCards = Math.round(
       (multiplierForOrdering *
         (weightIMP * convertedIMP +
           weightWinrate * (winCount / heroMatchCount) +
-          weightActivity * (heroMatchCount / mostPlayedPerHero))) /
-        (weightIMP + weightActivity + weightWinrate)
+          weightActivity * (heroMatchCount / mostPlayedPerHero) +
+          (weightAdvantage * (heroAdvScore + 50)) / 100)) /
+        (weightIMP + weightActivity + weightWinrate + weightAdvantage)
     );
     document.getElementById(
       `player${i}__hero${playerAsHero.heroId}`
@@ -372,7 +387,9 @@ async function applyOrderToHeroCard(i, id) {
     if (orderOfCards) {
       document.querySelector(
         `#player${i}__hero${playerAsHero.heroId} .heroScore`
-      ).innerText = Math.round((orderOfCards - multiplierForOrdering / 2) / 10);
+      ).innerText = Math.round(
+        (orderOfCards * 100) / multiplierForOrdering - 50 //Divide by multiplierForOrdering to return to 0-1 scale, multiply by 100 to get percents, and subtract 50 to set 50% to 0.
+      );
     }
     if (heroMatchCount > 0) {
       document.querySelector(
@@ -394,7 +411,6 @@ function findTotalMatches(playerPerformanceObj) {
     if (playerAsHero.matchCount > 0) totalHeroesPlayed++;
     if (mostPlayedPerHero < playerAsHero.matchCount) {
       mostPlayedPerHero = playerAsHero.matchCount;
-      console.log(mostPlayedPerHero);
     }
   });
   return { totalMatchCount, totalHeroesPlayed, mostPlayedPerHero };
@@ -520,18 +536,14 @@ function useUrlQuery() {
 
 let matchUps;
 async function startProgram() {
+  let matchUpsLogTime;
+  let advFile = await fetch("../matchups.json");
+  matchUps = await advFile.json();
+  if (localStorage.getItem(`matchUps`)) {
+    matchUps = JSON.parse(localStorage.getItem(`matchUps`));
+    matchUpsLogTime = JSON.parse(localStorage.getItem(`matchUpsLogTime`));
+  }
   if (lastResetTime < Date.now() - expiration) {
-    let matchUpsLogTime;
-    const defaultMatchups = async () => {
-      fetch("../matchups.json")
-        .then((res) => res.json())
-        .then((data) => matchUps = data);
-    };
-
-    !localStorage.getItem(`matchUps`)
-      ? defaultMatchups() && (matchUpsLogTime = "0")
-      : (matchUps = JSON.parse(localStorage.getItem(`matchUps`))) &&
-        (matchUpsLogTime = JSON.parse(localStorage.getItem(`matchUpsLogTime`)));
     localStorage.clear();
     localStorage.setItem("lastResetTime", Date.now());
     localStorage.setItem(`matchUps`, JSON.stringify(matchUps));
@@ -639,7 +651,6 @@ function findBestSynergyCounter(heroId, allyArray, enemyArray, bans) {
   });
 
   let strongestTeamScore = 0;
-  console.log(strongestTeam);
   strongestTeam.forEach((elem) => {
     if (elem?.synergy) strongestTeamScore += elem.synergy;
   });
@@ -686,16 +697,13 @@ const getPickBanArrays = () => {
   return { allPicks, radiantArray, direArray, bans };
 };
 
-// async function applyAllAdv() {
-//   for (let i = 0; i < 10; i++) {
-//     for (let j = 0; j < heroStats.length; j++) {
-//       applyAdvScore(i, heroStats[j].id);
-//     }
-//   }
-// }
-async function applyAllAdv2() {
+let advCalculated;
+async function applyAdvantages() {
+  advCalculated = [];
   let { allPicks, radiantArray, direArray, bans } = getPickBanArrays();
   let heroAdv = iterateThroughHeroes((heroId) => {
+    let obj = {};
+    obj.heroId = heroId;
     let radiantAdv;
     let direAdv;
     if (!allPicks.includes(heroId) && !bans.includes(heroId)) {
@@ -706,12 +714,15 @@ async function applyAllAdv2() {
         direArray,
         bans
       ).totalPickScore;
+      obj.radiantAdv = radiantAdv;
       direAdv = findBestSynergyCounter(
         heroId,
         direArray,
         radiantArray,
         bans
       ).totalPickScore;
+      obj.direAdv = direAdv;
+      advCalculated.push(obj);
       for (let radiantPlayer = 0; radiantPlayer < 5; radiantPlayer++) {
         document.querySelector(
           `#player${radiantPlayer}__hero${heroId} > div.collapsingCard > div.container.container__advantage > span.advantage.cardData`
