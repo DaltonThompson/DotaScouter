@@ -537,7 +537,7 @@ function useUrlQuery() {
 let matchUps;
 async function startProgram() {
   let matchUpsLogTime;
-  let advFile = await fetch("../matchups.json");
+  let advFile = await fetch("./src/matchups.json");
   matchUps = await advFile.json();
   if (localStorage.getItem(`matchUps`)) {
     matchUps = JSON.parse(localStorage.getItem(`matchUps`));
