@@ -1,5 +1,7 @@
 let mayNeedReset = true;
 let lastResetTime;
+if (localStorage.getItem("lastResetTime") == "undefined")
+  localStorage.removeItem("lastResetTime");
 localStorage.getItem("lastResetTime")
   ? (lastResetTime = localStorage.getItem("lastResetTime"))
   : (lastResetTime = localStorage.setItem("lastResetTime", Date.now()));
