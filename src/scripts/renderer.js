@@ -1,7 +1,9 @@
 let mayNeedReset = true;
 let lastResetTime;
 if (localStorage.getItem("lastResetTime") == "undefined")
-  localStorage.removeItem("lastResetTime");
+  localStorage.setItem("lastResetTime", "0");
+if (localStorage.getItem("matchUpsLogTime") == "undefined")
+  localStorage.setItem("matchUpsLogTime", "0");
 localStorage.getItem("lastResetTime")
   ? (lastResetTime = localStorage.getItem("lastResetTime"))
   : (lastResetTime = localStorage.setItem("lastResetTime", Date.now()));
@@ -16,8 +18,8 @@ let gameVersionsToUseString;
 
 let weightIMP = 1; // IMP is 'Individual Match Performance' provided by Stratz
 let weightActivity = 1; // Activity currently refers to a directly calculated percent of all matches in which the hero is played.
-let weightWinrate = 0.5; // 0% is an unplayed hero, 100% is a most played hero.
-let weightAdvantage = 0.5;
+let weightWinrate = 1; // 0% is an unplayed hero, 100% is a most played hero.
+let weightAdvantage = 5;
 let multiplierForOrdering = 1000; // -1000 turns 0.536 into -536, useful for percents where the first decimal matters, and must be negative to display in descending order.
 
 // DOM references
@@ -353,57 +355,65 @@ async function applyOrderToHeroCard(i, id) {
   }
   let { totalMatchCount, totalHeroesPlayed, mostPlayedPerHero } =
     findTotalMatches(performanceRef);
-  performanceRef.forEach((playerAsHero) => {
-    let { convertedIMP, heroMatchCount, winCount } =
-      heroIMPAndMatchCount(playerAsHero);
-    if (convertedIMP) {
-      document.querySelector(
-        `#player${i}__hero${playerAsHero.heroId} .heroIMP`
-      ).innerText = Math.round(convertedIMP * 100 - 50);
+
+  iterateThroughHeroes((heroId) => {
+    //if we can find the hero in the player's history
+    let convertedIMP;
+    let heroMatchCount = 0;
+    let winCount = 0;
+    let heroObject = performanceRef.find(
+      (playerAsHero) => playerAsHero.heroId == heroId
+    );
+    if (heroObject) {
+      console.log(heroObject);
+      let matchesAndImp = heroIMPAndMatchCount(heroObject);
+      convertedIMP = matchesAndImp.convertedIMP;
+      heroMatchCount = matchesAndImp.heroMatchCount;
+      winCount = matchesAndImp.winCount;
     } else {
-      document.querySelector(
-        `#player${i}__hero${playerAsHero.heroId} .heroIMP`
-      ).innerText = "N/A";
+    }
+    if (convertedIMP !== undefined) {
+      document.querySelector(`#player${i}__hero${heroId} .heroIMP`).innerText =
+        Math.round(convertedIMP * 100 - 50);
+    } else {
+      document.querySelector(`#player${i}__hero${heroId} .heroIMP`).innerText =
+        "";
       document
-        .querySelector(`#player${i}__hero${playerAsHero.heroId} .heroIMP`)
+        .querySelector(`#player${i}__hero${heroId} .heroIMP`)
         .classList.add("unknownValue");
-      convertedIMP = 0.5;
+      convertedIMP = 0;
     }
     let heroAdvScore = 0;
-    if (advCalculated.find((elem) => elem.heroId == playerAsHero.heroId)) {
-      let heroAdvObj = advCalculated.find(
-        (elem) => elem.heroId == playerAsHero.heroId
-      );
+    let foundAdv = advCalculated.find((elem) => elem.heroId == heroId)
+    if (foundAdv) {
       i < 5
-        ? (heroAdvScore = heroAdvObj.radiantAdv)
-        : (heroAdvScore = heroAdvObj.direAdv);
+        ? (heroAdvScore = foundAdv.radiantAdv)
+        : (heroAdvScore = foundAdv.direAdv);
+    }
+    if (heroMatchCount > 0) {
+      document.querySelector(`#player${i}__hero${heroId} .winRate`).innerText =
+        Math.round((100 * winCount) / heroMatchCount) - 50;
+      document.querySelector(
+        `#player${i}__hero${heroId} .matchCount`
+      ).innerText = heroMatchCount;
+    } else {
+      heroMatchCount = 1;
     }
     let orderOfCards = Math.round(
       (multiplierForOrdering *
         (weightIMP * convertedIMP +
           weightWinrate * (winCount / heroMatchCount) +
           weightActivity * (heroMatchCount / mostPlayedPerHero) +
-          (weightAdvantage * (heroAdvScore + 50)) / 100)) /
+          weightAdvantage * heroAdvScore)) /
         (weightIMP + weightActivity + weightWinrate + weightAdvantage)
     );
-    document.getElementById(
-      `player${i}__hero${playerAsHero.heroId}`
-    ).style.order = -orderOfCards;
-    if (orderOfCards) {
-      document.querySelector(
-        `#player${i}__hero${playerAsHero.heroId} .heroScore`
-      ).innerText = Math.round(
+    if (heroId == 1 && i == 4) console.log(orderOfCards);
+    document.getElementById(`player${i}__hero${heroId}`).style.order =
+      -orderOfCards;
+    document.querySelector(`#player${i}__hero${heroId} .heroScore`).innerText =
+      Math.round(
         (orderOfCards * 100) / multiplierForOrdering - 50 //Divide by multiplierForOrdering to return to 0-1 scale, multiply by 100 to get percents, and subtract 50 to set 50% to 0.
       );
-    }
-    if (heroMatchCount > 0) {
-      document.querySelector(
-        `#player${i}__hero${playerAsHero.heroId} .winRate`
-      ).innerText = Math.round((100 * winCount) / heroMatchCount) + "%";
-      document.querySelector(
-        `#player${i}__hero${playerAsHero.heroId} .matchCount`
-      ).innerText = heroMatchCount;
-    }
   });
 }
 
@@ -424,7 +434,7 @@ function findTotalMatches(playerPerformanceObj) {
 // Takes each line of heroPerformance, pulls the player's hero IMP score, converts into 0-to-1 scale (compatible with percentages), and returns it.
 function heroIMPAndMatchCount(playerAsHero) {
   let convertedIMP;
-  if (playerAsHero.imp !== undefined)
+  if (playerAsHero.imp && playerAsHero.imp !== undefined)
     convertedIMP = (playerAsHero.imp + 100) / 200; // turns -100 -> 100 into 0 -> 1
   return {
     convertedIMP: convertedIMP,
@@ -619,48 +629,51 @@ async function getMatchups(id, take) {
 
 function findBestSynergyCounter(heroId, allyArray, enemyArray, bans) {
   let matchUpsOfHero = matchUps.find((element) => element.heroId == heroId);
-  let matchUpsOfHeroSpliced = matchUpsOfHero;
-
-  for (let i = 0; i < matchUpsOfHeroSpliced.vs.length; i++) {
-    if (bans?.includes(matchUpsOfHeroSpliced.vs[i].heroId2))
-      matchUpsOfHeroSpliced.vs.splice(i, 1);
+  if (!matchUpsOfHero) {
+    console.log(
+      "A hero could not be found. This may happen if a new hero been recently introduced to the game."
+    );
+    return;
   }
-  for (let i = 0; i < matchUpsOfHeroSpliced.with.length; i++) {
-    if (bans?.includes(matchUpsOfHeroSpliced.with[i].heroId2))
-      matchUpsOfHeroSpliced.with.splice(i, 1);
+  for (let i = 0; i < matchUpsOfHero.vs.length; i++) {
+    if (bans?.includes(matchUpsOfHero.vs[i].heroId2))
+      matchUpsOfHero.vs.splice(i, 1);
+  }
+  for (let i = 0; i < matchUpsOfHero.with.length; i++) {
+    if (bans?.includes(matchUpsOfHero.with[i].heroId2))
+      matchUpsOfHero.with.splice(i, 1);
   }
 
-  let strongestCounters = matchUpsOfHeroSpliced.vs.slice(
-    matchUpsOfHeroSpliced.vs.length + enemyArray?.length - 5,
-    matchUpsOfHeroSpliced.vs.length
+  let strongestCounters = matchUpsOfHero.vs.slice(
+    matchUpsOfHero.vs.length + enemyArray?.length - 5,
+    matchUpsOfHero.vs.length
   );
   enemyArray?.forEach((heroId2) => {
     strongestCounters.push(
-      matchUpsOfHeroSpliced.vs.find((element) => element.heroId2 == heroId2)
+      matchUpsOfHero.vs.find((element) => element.heroId2 == heroId2)
     );
   });
 
   let strongestCountersScore = 0;
   strongestCounters.forEach((elem) => {
-    if (elem?.synergy) strongestCountersScore += elem.synergy;
+    if (elem?.winRate) strongestCountersScore += elem.winRate;
   });
+  strongestCountersScore = strongestCountersScore / strongestCounters.length;
 
-  let strongestTeam = matchUpsOfHeroSpliced.with.slice(
-    0,
-    4 - allyArray?.length
-  );
+  let strongestTeam = matchUpsOfHero.with.slice(0, 4 - allyArray?.length);
   allyArray?.forEach((heroId2) => {
     strongestTeam.push(
-      matchUpsOfHeroSpliced.with.find((element) => element.heroId2 == heroId2)
+      matchUpsOfHero.with.find((element) => element.heroId2 == heroId2)
     );
   });
 
   let strongestTeamScore = 0;
   strongestTeam.forEach((elem) => {
-    if (elem?.synergy) strongestTeamScore += elem.synergy;
+    if (elem?.winRate) strongestTeamScore += elem.winRate;
   });
+  strongestTeamScore = strongestTeamScore / strongestTeam.length;
 
-  let totalPickScore = strongestCountersScore + strongestTeamScore;
+  let totalPickScore = (strongestCountersScore + strongestTeamScore) / 2;
 
   return {
     strongestCounters,
@@ -669,14 +682,6 @@ function findBestSynergyCounter(heroId, allyArray, enemyArray, bans) {
     strongestTeamScore,
     totalPickScore,
   };
-}
-
-function applyAdvScore(player, heroId) {
-  document.querySelector(
-    `#player${player}__hero${heroId} > div.collapsingCard > div.container.container__advantage > span.advantage.cardData`
-  ).innerText = Math.round(
-    findBestSynergyCounter(heroId, allyArray, enemyArray, bans)[4]
-  );
 }
 
 const getPickBanArrays = () => {
@@ -706,37 +711,44 @@ let advCalculated;
 async function applyAdvantages() {
   advCalculated = [];
   let { allPicks, radiantArray, direArray, bans } = getPickBanArrays();
-  let heroAdv = iterateThroughHeroes((heroId) => {
+  iterateThroughHeroes((heroId) => {
     let obj = {};
     obj.heroId = heroId;
-    let radiantAdv;
-    let direAdv;
+    let radiantAdv,
+      direAdv,
+      radiantAdvToDisplay = "",
+      direAdvToDisplay = "";
     if (!allPicks.includes(heroId) && !bans.includes(heroId)) {
-      // iterateThroughPlayers((i) => applyAdvScore(i, j));
-      radiantAdv = findBestSynergyCounter(
-        heroId,
-        radiantArray,
-        direArray,
-        bans
-      ).totalPickScore;
-      obj.radiantAdv = radiantAdv;
-      direAdv = findBestSynergyCounter(
-        heroId,
-        direArray,
-        radiantArray,
-        bans
-      ).totalPickScore;
-      obj.direAdv = direAdv;
-      advCalculated.push(obj);
+      try {
+        radiantAdv = findBestSynergyCounter(
+          heroId,
+          radiantArray,
+          direArray,
+          bans
+        ).totalPickScore;
+        obj.radiantAdv = radiantAdv;
+        direAdv = findBestSynergyCounter(
+          heroId,
+          direArray,
+          radiantArray,
+          bans
+        ).totalPickScore;
+        obj.direAdv = direAdv;
+        advCalculated.push(obj);
+        radiantAdvToDisplay = Math.round(radiantAdv * 100) - 50;
+        direAdvToDisplay = Math.round(direAdv * 100) - 50;
+      } catch (error) {
+        console.log("Could not find hero advantages.");
+      }
       for (let radiantPlayer = 0; radiantPlayer < 5; radiantPlayer++) {
         document.querySelector(
           `#player${radiantPlayer}__hero${heroId} > div.collapsingCard > div.container.container__advantage > span.advantage.cardData`
-        ).innerText = Math.round(radiantAdv);
+        ).innerText = radiantAdvToDisplay;
       }
       for (let direPlayer = 5; direPlayer < 10; direPlayer++) {
         document.querySelector(
           `#player${direPlayer}__hero${heroId} > div.collapsingCard > div.container.container__advantage > span.advantage.cardData`
-        ).innerText = Math.round(direAdv);
+        ).innerText = direAdvToDisplay;
       }
     }
   });

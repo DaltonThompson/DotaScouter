@@ -996,6 +996,7 @@ $player9-color: rgb(159, 107, 0); */
 * {
   font-family: "Radiance", "Open Sans", sans-serif;
   margin: 0;
+  transition: 100ms;
 }
 
 body {
@@ -1271,6 +1272,9 @@ input[type=number] {
   width: calc(100% - 5em);
   box-sizing: border-box;
 }
+.options_grid > .banned {
+  display: none;
+}
 
 .noHeroData {
   display: none;
@@ -1296,13 +1300,30 @@ input[type=number] {
   background-repeat: no-repeat;
   background-position: center;
   text-align: center;
-  padding: 0.75rem 0.75rem 0.5rem 0.75rem;
+  padding: 0.75rem;
   box-sizing: border-box;
   text-shadow: 0px 0px 10px black;
   color: white;
   box-shadow: 0 2px 5px 0px black;
   border-radius: 0.5em;
   width: 100%;
+}
+.heroCard:not(.expanded) .collapsingCard {
+  display: none;
+}
+.heroCard.expanded {
+  grid-row-end: span 2;
+}
+.heroCard .heroIcon {
+  pointer-events: none;
+  height: 2.5rem;
+  margin: auto;
+  float: left;
+}
+.heroCard .container {
+  width: 100%;
+  clear: both;
+  pointer-events: none;
 }
 
 label {
@@ -1313,7 +1334,6 @@ label {
 .draggable {
   cursor: grab;
 }
-
 .draggable.dragging {
   opacity: 0.5;
 }
@@ -1333,11 +1353,9 @@ label {
   border-radius: 0.5em;
   padding: 0.5em;
 }
-
 #banbox > .icon {
   display: none;
 }
-
 #banbox > .banned {
   display: flex;
   opacity: 0.8;
@@ -1346,10 +1364,6 @@ label {
 #ban-title {
   width: 100%;
   text-align: center;
-}
-
-.options_grid > .banned {
-  display: none;
 }
 
 .icon {
@@ -1364,23 +1378,10 @@ label {
   background-color: #555;
 }
 
-.heroCard .heroIcon {
-  pointer-events: none;
-  height: 2.5rem;
-  margin: auto;
-  float: left;
-}
-
-.heroCard .container {
-  width: 100%;
-  clear: both;
-  pointer-events: none;
-}
-
 .cardTitle {
   float: left;
   opacity: 0.8;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   margin: 0.1rem 0;
 }
 
@@ -1389,25 +1390,22 @@ label {
 }
 
 .heroScore {
-  margin: 0.75rem 0.25rem;
-}
-
-.heroCard:not(.expanded) .collapsingCard {
-  display: none;
+  margin: 0.75rem 0;
 }
 
 .collapsingCard {
   pointer-events: none;
 }
-
-.unknownValue {
+.collapsingCard .cardData {
   font-size: 0.8rem;
-  opacity: 0.8;
+  line-height: 0.8rem;
   margin: 0.1rem 0;
 }
 
-.heroCard.expanded {
-  grid-row-end: span 2;
+.unknownValue {
+  font-size: 0.6rem;
+  opacity: 0.8;
+  margin: 0.1rem 0;
 }
 
 /*# sourceMappingURL=index.css.map */
