@@ -134,7 +134,6 @@ const fetchThings = async (targetUri, targetItem, backupUri) => {
 };
 
 const backupFetch = async (targetItem, backupUri) => {
-  // console.log(`%cFetching backup: %c${backupUri}`, "color:#f4f", "color:#eee");
   const response = await fetch(backupUri);
   if (response.status === 200) {
     let obj = await response.text();
@@ -147,7 +146,6 @@ const backupFetch = async (targetItem, backupUri) => {
 };
 
 const fetchAndSave = async (targetItem, targetUri, backupUri) => {
-  // console.log(`%cFetching: %c${targetUri}`, "color:#f4f", "color:#eee");
   try {
     if (!mayNeedReset && localStorage[targetItem])
       return localStorage[targetItem];
@@ -289,20 +287,16 @@ function initializeHeroCards() {
 
   optionsContainer.addEventListener("dragstart", (e) => {
     const dragAndGlow = (targetElem) => {
-      console.log("dragAndGlow");
       targetElem.classList.add("dragging");
       banBox.classList.add("glow");
       pickBoxes.forEach((pickBox) => pickBox.classList.add("glow"));
       draggingElement = document.querySelector(".dragging");
-      console.log(draggingElement);
       dataHeroId = targetElem.getAttribute("data-heroId");
       document
         .querySelectorAll(`.hero${dataHeroId}`)
         .forEach((elem) => elem.classList.remove("banned"));
     };
-    console.log(e.target);
     if (e.target.classList.contains("heroCard")) {
-      console.log("dragging");
       dragAndGlow(e.target);
     }
   });
@@ -329,14 +323,12 @@ function initializeHeroCards() {
 }
 
 function orderCards() {
-  console.log("%cStarting orderCards", "color:#dd0");
   validPlayers.forEach((i) => {
     applyOrderToHeroCard(i, steamIds[i]);
   });
 }
 
 async function applyOrderToHeroCard(i, id) {
-  // console.log(i, id);
   let performanceRef;
   try {
     performanceRef = await JSON.parse(
@@ -365,7 +357,6 @@ async function applyOrderToHeroCard(i, id) {
       (playerAsHero) => playerAsHero.heroId == heroId
     );
     if (heroObject) {
-      console.log(heroObject);
       let matchesAndImp = heroIMPAndMatchCount(heroObject);
       convertedIMP = matchesAndImp.convertedIMP;
       heroMatchCount = matchesAndImp.heroMatchCount;
@@ -407,7 +398,6 @@ async function applyOrderToHeroCard(i, id) {
           weightAdvantage * heroAdvScore)) /
         (weightIMP + weightActivity + weightWinrate + weightAdvantage)
     );
-    if (heroId == 1 && i == 4) console.log(orderOfCards);
     document.getElementById(`player${i}__hero${heroId}`).style.order =
       -orderOfCards;
     document.querySelector(`#player${i}__hero${heroId} .heroScore`).innerText =
@@ -582,51 +572,6 @@ const iterateThroughHeroes = async (callback) => {
 const getAllMatchups = () =>
   iterateThroughHeroes((id) => getMatchups(id, heroStats.length - 1));
 
-async function getMatchups(id, take) {
-  const query = `query matchupQuery {
-      heroStats {
-          matchUp(heroId:${id}, take:${take}) {
-              heroId
-              with {
-                  heroId2
-                  count
-                  wins
-                  synergy
-              }
-              vs {
-                  heroId2
-                  count
-                  wins
-                  synergy
-              }
-          }
-      }
-  }`;
-  async function setResponse(repeatCount) {
-    const response = await fetch("https://api.stratz.com/graphql", {
-      credentials: "omit",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        query,
-      }),
-    });
-    if (response.status === 429 && repeatCount < 10) {
-      setTimeout(setResponse(repeatCount + 1), 3000 * repeatCount);
-      console.log(repeatCount);
-    }
-    if (response.status === 200) {
-      let text = await response.text();
-      let parsed = JSON.parse(text).data.heroStats.matchUp[0];
-      matchUpArray.push(parsed);
-    }
-  }
-  setResponse(0);
-}
-
 function findBestSynergyCounter(heroId, allyArray, enemyArray, bans) {
   let matchUpsOfHero = matchUps.find((element) => element.heroId == heroId);
   if (!matchUpsOfHero) {
@@ -738,7 +683,7 @@ async function applyAdvantages() {
         radiantAdvToDisplay = Math.round(radiantAdv * 100) - 50;
         direAdvToDisplay = Math.round(direAdv * 100) - 50;
       } catch (error) {
-        console.log("Could not find hero advantages.");
+        console.log(error);
       }
       for (let radiantPlayer = 0; radiantPlayer < 5; radiantPlayer++) {
         document.querySelector(
