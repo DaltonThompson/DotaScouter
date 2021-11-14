@@ -390,11 +390,12 @@ async function applyOrderToHeroCard(i, id) {
     } else {
       heroMatchCount = 1;
     }
+    if (mostPlayedPerHero == 0) mostPlayedPerHero = 1;
     let orderOfCards = Math.round(
       (multiplierForOrdering *
         (weightIMP * convertedIMP +
           weightWinrate * (winCount / heroMatchCount) +
-          weightActivity * (heroMatchCount / 20 /* mostPlayedPerHero*/) +
+          weightActivity * (heroMatchCount / mostPlayedPerHero) +
           weightAdvantage * heroAdvScore)) /
         (weightIMP + weightActivity + weightWinrate + weightAdvantage)
     );
