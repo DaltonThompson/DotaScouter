@@ -394,7 +394,7 @@ async function applyOrderToHeroCard(i, id) {
       (multiplierForOrdering *
         (weightIMP * convertedIMP +
           weightWinrate * (winCount / heroMatchCount) +
-          weightActivity * (heroMatchCount / mostPlayedPerHero) +
+          weightActivity * (heroMatchCount / 20 /* mostPlayedPerHero*/) +
           weightAdvantage * heroAdvScore)) /
         (weightIMP + weightActivity + weightWinrate + weightAdvantage)
     );
