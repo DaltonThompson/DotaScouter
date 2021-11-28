@@ -460,7 +460,7 @@ function useUrlQuery() {
   let url = new URL(window.location.href);
   let paramId = url.searchParams.getAll("id");
   let paramPos = url.searchParams.getAll("pos");
-  daysPast = url.searchParams.get("days");
+  if (url.searchParams.get("days")) daysPast = url.searchParams.get("days");
   steamIds = paramId;
   for (let i = 0; i < steamIds.length; i++) {
     document.getElementById(`playerId${i}`).value = steamIds[i];
