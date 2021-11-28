@@ -202,7 +202,7 @@ function initializeHeroCards() {
       heroCard.setAttribute("draggable", true);
 
       let heroCardPrimaryContainer = document.createElement("div");
-      let heroIcon = document.createElement("img");
+      let heroIcon = document.createElement("div");
       let heroScore = document.createElement("span");
       heroCardPrimaryContainer.classList.add(`container`);
       heroIcon.classList.add(`heroIcon`, `hero${heroStats[i].id}`, `draggable`);
