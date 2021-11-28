@@ -8,15 +8,9 @@ localStorage.getItem("lastResetTime")
   ? (lastResetTime = localStorage.getItem("lastResetTime"))
   : (lastResetTime = localStorage.setItem("lastResetTime", Date.now()));
 let expiration = 3600000 * 2; // Integer in ms. 3600000 ms === 1 hr
-let gameVersions; // Array to be read from cache/localStorage or fetched.
 
-// represent rows of gameVersions array
-let patches = 1;
-let gameVersionsDaysPast;
-// let gameVersionLatest = 0;
-let gameVersionsToUseString;
+let daysPast = 90;
 
-let weightIMP = 1; // IMP is 'Individual Match Performance' provided by Stratz
 let weightActivity = 1; // Activity currently refers to a directly calculated percent of all matches in which the hero is played.
 let weightWinrate = 1; // 0% is an unplayed hero, 100% is a most played hero.
 let weightAdvantage = 5;
@@ -130,10 +124,10 @@ const fetchThings = async (targetUri, targetItem, backupUri) => {
   const response = await fetch(targetUri);
   if (response.status === 200)
     return (localStorage[targetItem] = await response.text());
-  await backupFetch(targetItem, backupUri);
+  await playerHeroFetch(targetItem, backupUri);
 };
 
-const backupFetch = async (targetItem, backupUri) => {
+const playerHeroFetch = async (targetItem, backupUri) => {
   const response = await fetch(backupUri);
   if (response.status === 200) {
     let obj = await response.text();
@@ -157,30 +151,22 @@ const fetchAndSave = async (targetItem, targetUri, backupUri) => {
 };
 
 const getGlobalStats = async () => {
-  // Get heroStats & gameVersion, and determine which steamIds are valid simultaneously
-  await Promise.all([
-    fetchAndSave(`heroStats`, `https://api.opendota.com/api/heroStats`),
-    fetchAndSave(`gameVersions`, `https://api.stratz.com/api/v1/GameVersion`),
-  ]);
-  gameVersions = JSON.parse(localStorage.gameVersions);
-  gameVersionsDaysPast = Math.round(
-    (Date.now() - new Date(gameVersions[patches - 1].startDate)) / 3600000 / 24
-  );
+  // Get heroStats and determine which steamIds are valid simultaneously
+  await fetchAndSave(`heroStats`, `https://api.opendota.com/api/heroStats`);
   heroStats = JSON.parse(localStorage.heroStats);
 };
 
 const promiseChain = async () => {
-  // Get heroStats & gameVersion, and determine which steamIds are valid simultaneously
+  // Get heroStats, and determine which steamIds are valid simultaneously
   await determineValidPlayers();
   // Simultaneously get heroPerformance for each player and create hero cards.
   await Promise.all([
     iterateThroughPlayers((i) =>
-      fetchAndSave(
-        `player${steamIds[i]}patches${patches}`,
-        `https://api.stratz.com/api/v1/Player/${steamIds[i]}/heroPerformance?gameVersionId=${gameVersionsToUseString}`,
-        `https://api.opendota.com/api/players/${steamIds[i]}/heroes?date=${gameVersionsDaysPast}`
+      playerHeroFetch(
+        `player${steamIds[i]}days${daysPast}`,
+        `https://api.opendota.com/api/players/${steamIds[i]}/heroes?date=${daysPast}`
       )
-    ), // `?gameVersionId=` a comma-delimited array of patch IDs. Currently saving only the most recent (i.e. gameVersions[0]), but may need to add looping if fetching data from other patches.
+    ),
     initializeHeroCards(),
   ]);
   await applyAdvantages();
@@ -190,7 +176,7 @@ const promiseChain = async () => {
   await iterateThroughPlayers((i) =>
     fetchAndSave(
       `player${steamIds[i]}`,
-      `https://api.stratz.com/api/v1/Player/${steamIds[i]}`
+      `https://api.opendota.com/api/players/${steamIds[i]}`
     )
   ),
     iterateThroughPlayers(createPlayerCards);
@@ -250,16 +236,6 @@ function initializeHeroCards() {
       winRateContainer.appendChild(elemTitleWinRate);
       winRateContainer.appendChild(elemWinRate);
 
-      let heroIMPContainer = document.createElement("div");
-      let elemIMP = document.createElement("span");
-      let elemTitleIMP = document.createElement("span");
-      heroIMPContainer.className = `container container__heroIMPContainer`;
-      elemTitleIMP.className = `cardTitle cardTitle__heroIMP`;
-      elemTitleIMP.innerText = "IMP";
-      elemIMP.className = `heroIMP cardData`;
-      heroIMPContainer.appendChild(elemTitleIMP);
-      heroIMPContainer.appendChild(elemIMP);
-
       let advantageContainer = document.createElement("div");
       let elemAdvScore = document.createElement("span");
       let elemTitleAdv = document.createElement("span");
@@ -272,7 +248,6 @@ function initializeHeroCards() {
 
       collapsingCard.appendChild(matchCountContainer);
       collapsingCard.appendChild(winRateContainer);
-      collapsingCard.appendChild(heroIMPContainer);
       collapsingCard.appendChild(advantageContainer);
       heroCard.appendChild(collapsingCard);
     }
@@ -332,7 +307,7 @@ async function applyOrderToHeroCard(i, id) {
   let performanceRef;
   try {
     performanceRef = await JSON.parse(
-      localStorage.getItem(`player${id}patches${patches}`)
+      localStorage.getItem(`player${id}days${daysPast}`)
     );
   } catch (error) {
     // return (document.getElementById(`player${i}__noHeroData`).style.display =
@@ -350,7 +325,6 @@ async function applyOrderToHeroCard(i, id) {
 
   iterateThroughHeroes((heroId) => {
     //if we can find the hero in the player's history
-    let convertedIMP;
     let heroMatchCount = 0;
     let winCount = 0;
     let heroObject = performanceRef.find(
@@ -358,24 +332,12 @@ async function applyOrderToHeroCard(i, id) {
     );
     if (heroObject) {
       let matchesAndImp = heroIMPAndMatchCount(heroObject);
-      convertedIMP = matchesAndImp.convertedIMP;
       heroMatchCount = matchesAndImp.heroMatchCount;
       winCount = matchesAndImp.winCount;
     } else {
     }
-    if (convertedIMP !== undefined) {
-      document.querySelector(`#player${i}__hero${heroId} .heroIMP`).innerText =
-        Math.round(convertedIMP * 100 - 50);
-    } else {
-      document.querySelector(`#player${i}__hero${heroId} .heroIMP`).innerText =
-        "";
-      document
-        .querySelector(`#player${i}__hero${heroId} .heroIMP`)
-        .classList.add("unknownValue");
-      convertedIMP = 0;
-    }
     let heroAdvScore = 0;
-    let foundAdv = advCalculated.find((elem) => elem.heroId == heroId)
+    let foundAdv = advCalculated.find((elem) => elem.heroId == heroId);
     if (foundAdv) {
       i < 5
         ? (heroAdvScore = foundAdv.radiantAdv)
@@ -393,11 +355,10 @@ async function applyOrderToHeroCard(i, id) {
     if (mostPlayedPerHero == 0) mostPlayedPerHero = 1;
     let orderOfCards = Math.round(
       (multiplierForOrdering *
-        (weightIMP * convertedIMP +
-          weightWinrate * (winCount / heroMatchCount) +
+        (weightWinrate * (winCount / heroMatchCount) +
           weightActivity * (heroMatchCount / mostPlayedPerHero) +
           weightAdvantage * heroAdvScore)) /
-        (weightIMP + weightActivity + weightWinrate + weightAdvantage)
+        (weightActivity + weightWinrate + weightAdvantage)
     );
     document.getElementById(`player${i}__hero${heroId}`).style.order =
       -orderOfCards;
@@ -424,11 +385,7 @@ function findTotalMatches(playerPerformanceObj) {
 
 // Takes each line of heroPerformance, pulls the player's hero IMP score, converts into 0-to-1 scale (compatible with percentages), and returns it.
 function heroIMPAndMatchCount(playerAsHero) {
-  let convertedIMP;
-  if (playerAsHero.imp && playerAsHero.imp !== undefined)
-    convertedIMP = (playerAsHero.imp + 100) / 200; // turns -100 -> 100 into 0 -> 1
   return {
-    convertedIMP: convertedIMP,
     heroMatchCount: playerAsHero.matchCount,
     winCount: playerAsHero.winCount,
   };
@@ -438,13 +395,13 @@ const createPlayerCards = (i) => {
   let playerRef;
   try {
     if (localStorage[`player${steamIds[i]}`] == "")
-      throw "Stratz has no player data.";
+      throw "API has no player data.";
     playerRef = JSON.parse(localStorage[`player${steamIds[i]}`]);
     document.querySelector(`.player${i} .player_name`).innerText =
-      playerRef?.steamAccount?.name;
+      playerRef?.profile?.personaname;
     let playeri = document.querySelector(`.player${i} .player_rank`);
-    if (playerRef.steamAccount?.seasonRank) {
-      let tier = playerRef.steamAccount.seasonRank.toString();
+    if (playerRef?.rank_tier) {
+      let tier = playerRef?.rank_tier.toString();
       let medal = tier.charAt(0),
         star = tier.charAt(1);
 
@@ -480,8 +437,8 @@ const createPlayerCards = (i) => {
 
         case "8":
           playeri.innerText = `Immortal${
-            playerRef.steamAccount.seasonLeaderboardRank
-              ? " #" + playerRef.steamAccount.seasonLeaderboardRank
+            playerRef?.leaderboard_rank
+              ? " #" + playerRef?.leaderboard_rank
               : ""
           }`;
           break;
@@ -503,7 +460,7 @@ function useUrlQuery() {
   let url = new URL(window.location.href);
   let paramId = url.searchParams.getAll("id");
   let paramPos = url.searchParams.getAll("pos");
-  patches = url.searchParams.get("patches");
+  daysPast = url.searchParams.get("days");
   steamIds = paramId;
   for (let i = 0; i < steamIds.length; i++) {
     document.getElementById(`playerId${i}`).value = steamIds[i];
@@ -532,11 +489,7 @@ function useUrlQuery() {
     }
     document.getElementById(`player${i}__player_role`).innerText = roleToInsert;
   }
-  document.getElementById(`patches`).value = patches;
-  let gameVersionToUseArray = [];
-  for (let i = 0; i < patches; i++)
-    gameVersionToUseArray.push(gameVersions[i].id);
-  gameVersionsToUseString = gameVersionToUseArray.toString();
+  document.getElementById(`days`).value = daysPast;
   promiseChain();
 }
 
