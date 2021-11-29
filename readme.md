@@ -7,4 +7,4 @@ This tool is inspired by others such as Dotapicker, DotaPlus for Overwolf, and D
 ## Is there a desktop version that automatically updates player IDs?
 If you are comfortable running Node.js to read local files, please check out the [Autoreader for Dota Scouter](https://github.com/DaltonThompson/dotascouter-autoreader).
 ## Notes
-This program is subject to the status of multiple third-party APIs.
+This program is subject to the status of the third-party [OpenDota API](https://docs.opendota.com/).
